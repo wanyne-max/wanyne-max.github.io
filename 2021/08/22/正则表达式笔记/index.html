@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>正则表达式笔记 - Wanyne&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Wanyne&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wanyne&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="正则过于重要（最近越来越多用到：Java的split函数、js、nginx的配置、Linux），但是我基本8会写，所以一边学一边记录下。"><meta property="og:type" content="blog"><meta property="og:title" content="正则表达式笔记"><meta property="og:url" content="https://wanyne-max.github.io/2021/08/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/"><meta property="og:site_name" content="Wanyne&#039;s Blog"><meta property="og:description" content="正则过于重要（最近越来越多用到：Java的split函数、js、nginx的配置、Linux），但是我基本8会写，所以一边学一边记录下。"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://wanyne-max.github.io/img/og_image.png"><meta property="article:published_time" content="2021-08-22T15:11:46.000Z"><meta property="article:modified_time" content="2021-08-22T16:04:33.396Z"><meta property="article:author" content="Wanyne W"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://wanyne-max.github.io/2021/08/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/"},"headline":"正则表达式笔记","image":["https://wanyne-max.github.io/img/og_image.png"],"datePublished":"2021-08-22T15:11:46.000Z","dateModified":"2021-08-22T16:04:33.396Z","author":{"@type":"Person","name":"Wanyne W"},"publisher":{"@type":"Organization","name":"Wanyne's Blog","logo":{"@type":"ImageObject","url":"https://wanyne-max.github.io/img/logo.svg"}},"description":"正则过于重要（最近越来越多用到：Java的split函数、js、nginx的配置、Linux），但是我基本8会写，所以一边学一边记录下。"}</script><link rel="canonical" href="https://wanyne-max.github.io/2021/08/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.15.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/pace/1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-08-22T15:11:46.000Z" title="2021/8/22 下午11:11:46">2021-08-22</time>发表</span><span class="level-item"><time dateTime="2021-08-22T16:04:33.396Z" title="2021/8/23 上午12:04:33">2021-08-23</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span><span class="level-item">17 分钟读完 (大约2581个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">正则表达式笔记</h1><div class="content"><p>正则过于重要（最近越来越多用到：Java的split函数、js、nginx的配置、Linux），但是我基本8会写，所以一边学一边记录下。</p>
+<p><escape><span id="more"></span></escape></p>
+</br>
+
+<h1 id="工具-网站安利"><a href="#工具-网站安利" class="headerlink" title="工具/网站安利"></a>工具/网站安利</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/regexp-tester/fekbbmalpajhfifodaakkfeodkpigjbk">RegExp Tester</a>：一个用于测试的chrome扩展，体积小且方便。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://regexone.com/">regexone</a>：交互式学习和练习正则表达式的网站。</p>
+</li>
+</ul>
+</br>
+
+<h1 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h1><p>(PS:因为我就看会了这点，有不对的还请各位大佬指出，也可能手抖敲错了)</p>
+</br>
+
+<h2 id="元字符"><a href="#元字符" class="headerlink" title="元字符"></a>元字符</h2><ul>
+<li><p><code>\b</code>：代表着单词的开头或结尾，也就是单词的分界处，它只匹配一个位置。</p>
+</li>
+<li><p><code>\w</code>：匹配字母或数字或下划线或汉字。</p>
+</li>
+<li><p><code>\d</code>：匹配数字，可以代替0到9之间的任何数字。</p>
+</li>
+<li><p><code>.</code> ：匹配任何单个字符（字母，数字，空格，所有内容），实际上会覆盖句号字符的匹配，因此，为了专门匹配句号，使用斜杠\来使句号转义。</p>
+</li>
+<li><p><code>\s</code>：匹配任意的空白符。</p>
+</li>
+<li><p><code>^</code>：匹配字符串的开始。</p>
+</li>
+<li><p><code>$</code>：匹配字符串的结束。</p>
+</li>
+<li><p><code>()</code>：小括号来指定子表达式(也叫做分组)，然后可以对这个表达式指定各项操作。</p>
+</li>
+</ul>
+</br>
+
+<h2 id="转义"><a href="#转义" class="headerlink" title="转义"></a>转义</h2><h3 id="查找元字符本身需要-转义，例："><a href="#查找元字符本身需要-转义，例：" class="headerlink" title="查找元字符本身需要\转义，例："></a>查找元字符本身需要<code>\</code>转义，例：</h3><ul>
+<li><code>regtest\.py</code> 匹配 <code>regtest.py</code>。</li>
+<li><code>C:\\Windows</code> 匹配 <code>C:\Windows</code>。</li>
+</ul>
+</br>
+
+<h2 id="反义"><a href="#反义" class="headerlink" title="反义"></a>反义</h2><ul>
+<li><p><code>\B</code>：匹配不是单词开头或结束的位置。</p>
+</li>
+<li><p><code>\W</code>：匹配任意不是字母，数字，下划线，汉字的字符。</p>
+</li>
+<li><p><code>\D</code>：匹配任意非数字的字符。</p>
+</li>
+<li><p><code>\S</code>：匹配任意不是空白符的字符。</p>
+</li>
+<li><p><code>[\^x]</code>：匹配除了x以外的任意字符。</p>
+</li>
+<li><p><code>[\^aeiou]</code>：匹配除了aeiou这几个字母以外的任意字符。</p>
+</li>
+</ul>
+<h3 id="例："><a href="#例：" class="headerlink" title="例："></a>例：</h3><ul>
+<li><p><code>\S+</code> ：匹配不包含空白符的字符串。</p>
+</li>
+<li><p><code>&lt;a[^&gt;]+&gt;</code> ：匹配用尖括号括起来的以a开头的字符串。</p>
+</li>
+</ul>
+</br>
+
+<h2 id="重复"><a href="#重复" class="headerlink" title="重复"></a>重复</h2><ul>
+<li><p><code>*</code> ：重复零次或更多次D</p>
+</li>
+<li><p><code>+</code> ：重复一次或更多次</p>
+</li>
+<li><p><code>?</code> ：重复零次或一次</p>
+</li>
+<li><p><code>&#123;n&#125;</code>：重复n次</p>
+</li>
+<li><p><code>&#123;n,&#125;</code>：重复n次或更多次</p>
+</li>
+<li><p><code>&#123;n,m&#125;</code>：重复n到m次</p>
+</li>
+</ul>
+<h3 id="例：-1"><a href="#例：-1" class="headerlink" title="例："></a>例：</h3><ul>
+<li><p><code>Windows\d+</code> ：匹配Windows后面跟1个或更多数字。</p>
+</li>
+<li><p><code>\^\w+</code> ：匹配 一行的第一个单词（或整个字符串的第一个单词）。</p>
+</li>
+</ul>
+</br>
+
+<h2 id="字符范围"><a href="#字符范围" class="headerlink" title="字符范围"></a>字符范围</h2><h3 id="表示法中："><a href="#表示法中：" class="headerlink" title="[]表示法中："></a><code>[]</code>表示法中：</h3><ul>
+<li><p><code>-</code>：表示字符范围。</p>
+</li>
+<li><p><code>^</code> ：表示不要某几个字符。</p>
+</li>
+</ul>
+<h3 id="例：-2"><a href="#例：-2" class="headerlink" title="例："></a>例：</h3><ul>
+<li><p><code>[0-6]</code> ：仅会匹配从零到六个的任何一位数字字符。</p>
+</li>
+<li><p><code>[^ np]</code> ：将仅匹配任何单个字符，但字母n至p除外。</p>
+</li>
+</ul>
+</br>
+
+<h2 id="后向引用、分组、捕获"><a href="#后向引用、分组、捕获" class="headerlink" title="后向引用、分组、捕获"></a>后向引用、分组、捕获</h2><p>默认情况下，每个分组会自动拥有一个组号，规则 是：从左向右，以分组的左括号为标志，第一个出现的分组的组号为1，第二个为2，以此类推。</p>
+</br>
+
+<h3 id="捕获"><a href="#捕获" class="headerlink" title="捕获"></a>捕获</h3><ul>
+<li><p><code>(exp)</code> ：匹配exp,并捕获文本到自动命名的组里。</p>
+</li>
+<li><p><code>(?exp)</code> ：匹配exp,并捕获文本到名称为name的组里，也可以写成 (?’name’exp)。</p>
+</li>
+<li><p><code>(?:exp)</code> ：匹配exp,不捕获匹配的文本，也不给此分组分配组号。（PS：不会改变正则表达式的处理方式，只是这样的组匹配的内容 不会像前两种那样 被捕获到某个组里面，也不会拥有组号。</p>
+</li>
+</ul>
+</br>
+
+<h3 id="零宽断言"><a href="#零宽断言" class="headerlink" title="零宽断言"></a>零宽断言</h3><ul>
+<li><code>(?=exp)</code> ：匹配exp前面的位置</li>
+<li><code>(?&lt;=exp)</code> ：匹配exp后面的位置</li>
+<li><code>(?!exp)</code> ：匹配后面跟的不是exp的位置</li>
+<li><code>(?&lt;!exp)</code> ：匹配前面不是exp的位置</li>
+</ul>
+</br>
+
+<h3 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h3><ul>
+<li><code>(? #comment)</code> ：这种类型的分组不对正则表达式的处理产生任何影响，用于提 供注释让人阅读</li>
+</ul>
+</br>
+
+<h2 id="懒惰匹配"><a href="#懒惰匹配" class="headerlink" title="懒惰匹配"></a>懒惰匹配</h2><p>匹配尽可能少的字符</p>
+<ul>
+<li><p><code>*?</code> ：重复任意次，但尽可能少重复</p>
+</li>
+<li><p><code>+?</code> ：重复1次或更多次，但尽可能少重复</p>
+</li>
+<li><p><code>??</code>：重复0次或1次，但尽可能少重复</p>
+</li>
+<li><p><code>&#123;n,m&#125;?</code>：重复n到m次，但尽可能少重复</p>
+</li>
+<li><p><code>&#123;n,&#125;?</code>：重复n次以上，但尽可能少重复</p>
+</li>
+</ul>
+</br>
+
+</br>
+
+<h1 id="常用的部分正则表达式"><a href="#常用的部分正则表达式" class="headerlink" title="常用的部分正则表达式"></a>常用的部分正则表达式</h1><p>整数或者小数：<code>^[0-9]+\.&#123;0,1&#125;[0-9]&#123;0,2&#125;$</code>。</p>
+<p>只能输入数字：<code>^[0-9]*$</code>。</p>
+<p>只能输入n位的数字：<code>^\d&#123;n&#125;$</code>。</p>
+<p>只能输入至少n位的数字：<code>^\d&#123;n,&#125;$</code>。</p>
+<p>只能输入m到n位的数字：<code>^\d&#123;m,n&#125;$</code>。</p>
+<p>只能输入零和非零开头的数字：<code>^(0|[1-9][0-9]*)$</code>。</p>
+<p>只能输入有两位小数的正实数：<code>^[0-9]+(.[0-9]&#123;2&#125;)?$</code>。</p>
+<p>只能输入有1到3位小数的正实数：<code>^[0-9]+(.[0-9]&#123;1,3&#125;)?$</code>。</p>
+<p>只能输入非零的正整数：<code>^\+?[1-9][0-9]*$</code>。</p>
+<p>只能输入非零的负整数：<code>^\-[1-9][]0-9″*$</code>。</p>
+<p>只能输入长度为3的字符：<code>^.&#123;3&#125;$</code>。</p>
+<p>只能输入由26个英文字母组成的字符串：<code>^[A-Za-z]+$</code>。</p>
+<p>只能输入由26个大写英文字母组成的字符串：<code>^[A-Z]+$</code>。</p>
+<p>只能输入由26个小写英文字母组成的字符串：<code>^[a-z]+$</code>。</p>
+<p>只能输入由数字和26个英文字母组成的字符串：<code>^[A-Za-z0-9]+$</code>。</p>
+<p>只能输入由数字、26个英文字母或者下划线组成的字符串：<code>^\w+$</code>。</p>
+<p>验证用户密码：<code>^[a-zA-Z]\w&#123;5,17&#125;$</code>。</p>
+<p>正确格式为：以字母开头，长度在6~18之间，只能包含字符、数字和下划线。验证是否含有<code>^%&amp;’,;=?$\</code>等字符：<code>[^%&amp;&#39;,;=?$\x22]+</code>。</p>
+<p>只能输入汉字：<code>^[\u4e00-\u9fa5]&#123;0,&#125;$</code>。</p>
+<p>验证Email地址：<code>^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$</code>。</p>
+<p>验证InternetURL：<code>^http://([\w-]+\.)+[\w-]+(/[\w-./?%&amp;=]*)?$</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">验证电话号码：^(\(\d&#123;3,4&#125;-)|\d&#123;3.4&#125;-)?\d&#123;7,8&#125;$。</span><br><span class="line"></span><br><span class="line">正确格式为：XXX-XXXXXXX、XXXX-XXXXXXXX、XXX-XXXXXXX、XXX-XXXXXXXX、XXXXXXX和XXXXXXXX。</span><br></pre></td></tr></table></figure>
+
+<p>验证身份证号（15位或18位数字）：<code>^\d&#123;15&#125;|\d&#123;18&#125;$</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">验证一年的12个月：^(0?[1-9]|1[0-2])$。</span><br><span class="line">正确格式为：”01″～”09″和”1″～”12″。</span><br><span class="line"></span><br><span class="line">验证一个月的31天：^((0?[1-9])|((1|2)[0-9])|30|31)$</span><br><span class="line">正确格式为；”01″～”09″和”1″～”31″。</span><br></pre></td></tr></table></figure>
+
+<p>匹配中文字符的正则表达式： <code>[\u4e00-\u9fa5]</code>。</p>
+<p>匹配双字节字符(包括汉字在内)：<code>[^\x00-\xff]</code>。</p>
+<p><b>应用</b>：计算字符串的长度（一个双字节字符长度计2，ASCII字符计1）<br><code>String.prototype.len=function()&#123;return this.replace(/[^\x00-\xff]/g,”aa”).length;&#125;</code></p>
+<p>匹配空行的正则表达式：<code>\n[\s| ]*\r</code></p>
+<p>匹配html标签的正则表达式：<code>&lt;(.*)&gt;(.*)&lt;\/(.*)&gt;|&lt;(.*)\/&gt;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">匹配首尾空格的正则表达式：(^\s*)|(\s*$)</span><br><span class="line">应用：javascript中没有像vbscript那样的trim函数，我们就可以利用这个表达式来实现，如下：</span><br><span class="line">String.prototype.trim = function()&#123;return this.replace(/(^\s*)|(\s*$)/g, “”);&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">利用正则表达式分解和转换IP地址：</span><br><span class="line">下面是利用正则表达式匹配IP地址，并将IP地址转换成对应数值的Javascript程序：</span><br><span class="line"></span><br><span class="line">function IP2V(ip)&#123;re=/(\d+)\.(\d+)\.(\d+)\.(\d+)/g //匹配IP地址的正则表达式</span><br><span class="line">if(re.test(ip))&#123;return RegExp.$1*Math.pow(255,3))+RegExp.$2*Math.pow(255,2))+RegExp.$3*255+RegExp.$4*1&#125;else&#123;throw new Error(“Not a valid IP address!”)&#125;&#125;</span><br><span class="line"></span><br><span class="line">//上面的程序直接用split函数来分解</span><br><span class="line">var ip=”10.100.20.168″ip=ip.split(“.”)alert(“IP值是：”+(ip[0]*255*255*255+ip[1]*255*255+ip[2]*255+ip[3]*1))</span><br></pre></td></tr></table></figure>
+<p>匹配Email地址的正则表达式：<code>\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*</code></p>
+<p>匹配网址URL的正则表达式：<code>http://([\w-]+\.)+[\w-]+(/[\w- ./?%&amp;=]*)?</code></p>
+</br>
+
+<h2 id="利用正则表达式限制网页表单里的文本框输入内容："><a href="#利用正则表达式限制网页表单里的文本框输入内容：" class="headerlink" title="利用正则表达式限制网页表单里的文本框输入内容："></a>利用正则表达式限制网页表单里的文本框输入内容：</h2><p>用正则表达式限制只能输入中文：</p>
+<p><code>onkeyup=”value=value.replace(/[^\u4E00-\u9FA5]/g,”)” onbeforepaste=”clipboardData.setData(‘text’,clipboardData.getData(‘text’).replace(/[^\u4E00-\u9FA5]/g,”))”</code></p>
+<p>用正则表达式限制只能输入全角字符：</p>
+<p> <code>onkeyup=”value=value.replace(/[^\uFF00-\uFFFF]/g,”)” onbeforepaste=”clipboardData.setData(‘text’,clipboardData.getData(‘text’).replace(/[^\uFF00-\uFFFF]/g,”))”</code></p>
+<p>用正则表达式限制只能输入数字：</p>
+<p><code>onkeyup=”value=value.replace(/[^\d]/g,”) “onbeforepaste=”clipboardData.setData(‘text’,clipboardData.getData(‘text’).replace(/[^\d]/g,”))”</code></p>
+<p>用正则表达式限制只能输入数字和英文：</p>
+<p><code>onkeyup=”value=value.replace(/[\W]/g,”) “onbeforepaste=”clipboardData.setData(‘text’,clipboardData.getData(‘text’).replace(/[^\d]/g,”))”</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">匹配中文字符的正则表达式：      [\u4e00-\u9fa5]</span><br><span class="line">匹配双字节字符(包括汉字在内)：  [^\x00-\xff]</span><br><span class="line">用来计算字符串的长度（一个双字节字符长度计2，ASCII字符计1）匹配空白行的正则表达式：\n\s*\r</span><br></pre></td></tr></table></figure>
+
+<p>可以用来删除空白行匹配HTML标记的正则表达式（仅对部分简单情况适用）：<code>&lt;(\S*?)[^&gt;]*&gt;.*?|&lt;.*? /&gt;</code></p>
+<p>匹配首尾空白字符的正则表达式：<code>^\s*|\s*$</code></p>
+<p>可以用来删除行首行尾的空白字符(包括空格、制表符、换页符等等)，非常有用的表达式匹配Email地址的正则表达式：<code>\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*</code></p>
+<p>表单验证时很实用匹配网址URL的正则表达式：<code>[a-zA-z]+://[^\s]*</code></p>
+<p>匹配帐号是否合法(字母开头，允许5-16字节，允许字母数字下划线)：<code>^[a-zA-Z][a-zA-Z0-9_]&#123;4,15&#125;$</code></p>
+<p>表单验证时很实用匹配国内电话号码：<code>\d&#123;3&#125;-\d&#123;8&#125;|\d&#123;4&#125;-\d&#123;7&#125; </code>匹配形式如 0511-4405222 或 021-87888822</p>
+<p>匹配腾讯QQ号：<code>[1-9][0-9]&#123;4,&#125;</code></p>
+<p>从10000开始匹配中国邮政编码(中国邮政编码为6位数字)：<code>[1-9]\d&#123;5&#125;(?!\d) </code></p>
+<p>匹配ip地址：<code>((2[0-4]\d|25[0-5]|[01]?\d\d?)\.)&#123;3&#125;(2[0-4]\d|25[0-5]|[01]?\d\d?)</code></p>
+<p>匹配正整数: <code>^-[1-9]\d*$</code></p>
+<p>匹配负整数: <code>^-?[1-9]\d*$</code></p>
+<p>匹配整数: <code>^[1-9]\d*|0$</code></p>
+<p>匹配非负整数（正整数 + 0）: <code>^-[1-9]\d*|0$</code></p>
+<p>匹配非正整数（负整数 + 0）: <code>^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$</code></p>
+<p>匹配正浮点数: <code>^-([1-9]\d*\.\d*|0\.\d*[1-9]\d*)$</code></p>
+<p>匹配负浮点数: <code>^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$</code></p>
+<p>匹配浮点数: <code>^[1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0$</code></p>
+<p>匹配非负浮点数（正浮点数 + 0）: <code>^(-([1-9]\d*\.\d*|0\.\d*[1-9]\d*))|0?\.0+|0$　　</code></p>
+<p>匹配非正浮点数（负浮点数 + 0）: <code>^[A-Za-z]+$</code> (处理大量数据时有用，具体应用时注意修正匹配特定字符串)</p>
+<p>匹配由26个英文字母组成的字符串: <code>^[A-Z]+$</code></p>
+<p>匹配由26个英文字母的大写组成的字符串: <code>^[a-z]+$</code></p>
+<p>匹配由26个英文字母的小写组成的字符串: <code>^[A-Za-z0-9]+$</code></p>
+<p>Email : <code>/^\w+([-+.]\w+)*@\w+([-.]\\w+)*\.\w+([-.]\w+)*$/</code></p>
+<p>isEmail1 : <code>/^\w+([\.\-]\w+)*\@\w+([\.\-]\w+)*\.\w+$/;</code></p>
+<p>isEmail2 : <code>/^.*@[^_]*$/;</code></p>
+<p>Phone : <code>/^((\(\d&#123;3&#125;\))|(\d&#123;3&#125;\-))?(\(0\d&#123;2,3&#125;\)|0\d&#123;2,3&#125;-)?[1-9]\d&#123;6,7&#125;$/</code></p>
+<p>Mobile : <code>/^((\(\d&#123;3&#125;\))|(\d&#123;3&#125;\-))?13\d&#123;9&#125;$/</code></p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>正则表达式笔记</p><p><a href="https://wanyne-max.github.io/2021/08/22/正则表达式笔记/">https://wanyne-max.github.io/2021/08/22/正则表达式笔记/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Wanyne W</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-08-22</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-08-23</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/" alt="支付宝"></span></a><a class="button donate" href="/" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>送我杯咖啡</span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021/08/13/%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E4%B9%8B%E5%90%8E%E5%8F%91%E7%94%9F%E7%9A%84%E7%A7%8D%E7%A7%8D/"><span class="level-item">输入网址之后的种种</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script>var disqus_config = function () {
+            this.page.url = 'https://wanyne-max.github.io/2021/08/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/';
+            this.page.identifier = '2021/08/22/正则表达式笔记/';
+        };
+        (function() {
+            var d = document, s = d.createElement('script');  
+            s.src = '//' + '不能为空' + '.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="Wanyne W"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Wanyne W</p><p class="is-size-6 is-block">所有命运的馈赠 早已暗中标注了价格</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">15</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">0</p></a></div></div></nav></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Blog/"><span class="level-start"><span class="level-item">Blog</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/Git/"><span class="level-start"><span class="level-item">Git</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C/"><span class="level-start"><span class="level-item">网络</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/%E8%80%83%E7%A0%94%E5%A4%8D%E4%B9%A0/"><span class="level-start"><span class="level-item">考研复习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">15</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-08-22T15:11:46.000Z">2021-08-22</time></p><p class="title"><a href="/2021/08/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/">正则表达式笔记</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-08-13T00:37:33.000Z">2021-08-13</time></p><p class="title"><a href="/2021/08/13/%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E4%B9%8B%E5%90%8E%E5%8F%91%E7%94%9F%E7%9A%84%E7%A7%8D%E7%A7%8D/">输入网址之后的种种</a></p><p class="categories"><a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-08-10T00:59:49.000Z">2021-08-10</time></p><p class="title"><a href="/2021/08/10/%E6%9D%82%E7%83%A9/">杂烩</a></p><p class="categories"><a href="/categories/%E8%80%83%E7%A0%94%E5%A4%8D%E4%B9%A0/">考研复习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-08-10T00:50:22.000Z">2021-08-10</time></p><p class="title"><a href="/2021/08/10/%E6%8C%87%E9%92%88/">指针</a></p><p class="categories"><a href="/categories/%E8%80%83%E7%A0%94%E5%A4%8D%E4%B9%A0/">考研复习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-08-09T04:13:41.000Z">2021-08-09</time></p><p class="title"><a href="/2021/08/09/c%E8%AF%AD%E8%A8%80%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/">c语言程序设计</a></p><p class="categories"><a href="/categories/%E8%80%83%E7%A0%94%E5%A4%8D%E4%B9%A0/">考研复习</a></p></div></article></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a><p class="is-size-7">   <span>&copy; 2021 Wanyne W</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">Made by Wanyne W</p><p class="is-size-7">Hope you have a good day！ ♥</p><p class="is-size-7">Creation date : 2021 08 05</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
