@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>JVM-内存 - Wanyne&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Wanyne&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wanyne&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="常见面试题 ：  介绍下 Java 内存区域（运行时数据区） Java 对象的创建过程（五步，建议能默写出来并且要知道每一步虚拟机做了什么） 对象的访问定位的两种方式（句柄和直接指针两种方式）"><meta property="og:type" content="blog"><meta property="og:title" content="JVM-内存"><meta property="og:url" content="https://wanyne-max.github.io/2022/02/02/JVM-%E5%86%85%E5%AD%98/"><meta property="og:site_name" content="Wanyne&#039;s Blog"><meta property="og:description" content="常见面试题 ：  介绍下 Java 内存区域（运行时数据区） Java 对象的创建过程（五步，建议能默写出来并且要知道每一步虚拟机做了什么） 对象的访问定位的两种方式（句柄和直接指针两种方式）"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://wanyne-max.github.io/img/og_image.png"><meta property="article:published_time" content="2022-02-01T18:22:22.000Z"><meta property="article:modified_time" content="2022-04-05T02:31:34.012Z"><meta property="article:author" content="Wanyne W"><meta property="article:tag" content="JVM"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://wanyne-max.github.io/2022/02/02/JVM-%E5%86%85%E5%AD%98/"},"headline":"JVM-内存","image":["https://wanyne-max.github.io/img/og_image.png"],"datePublished":"2022-02-01T18:22:22.000Z","dateModified":"2022-04-05T02:31:34.012Z","author":{"@type":"Person","name":"Wanyne W"},"publisher":{"@type":"Organization","name":"Wanyne's Blog","logo":{"@type":"ImageObject","url":"https://wanyne-max.github.io/img/logo.svg"}},"description":"常见面试题 ：  介绍下 Java 内存区域（运行时数据区） Java 对象的创建过程（五步，建议能默写出来并且要知道每一步虚拟机做了什么） 对象的访问定位的两种方式（句柄和直接指针两种方式）"}</script><link rel="canonical" href="https://wanyne-max.github.io/2022/02/02/JVM-%E5%86%85%E5%AD%98/"><link rel="icon" href="/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.15.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/pace/1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-02-01T18:22:22.000Z" title="2022/2/2 上午2:22:22">2022-02-02</time>发表</span><span class="level-item"><time dateTime="2022-04-05T02:31:34.012Z" title="2022/4/5 上午10:31:34">2022-04-05</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></span><span class="level-item">28 分钟读完 (大约4240个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">JVM-内存</h1><div class="content"><p>常见面试题 ：</p>
+<ul>
+<li>介绍下 Java 内存区域（运行时数据区）</li>
+<li>Java 对象的<code>创建过程</code>（五步，建议能默写出来并且要知道每一步虚拟机做了什么）</li>
+<li>对象的访问<code>定位</code>的两种方式（<code>句柄</code>和<code>直接指针</code>两种方式）</li>
+</ul>
+<p><escape><span id="more"></span></escape> </p>
+<br>
+
+<h1 id="内存区域详解"><a href="#内存区域详解" class="headerlink" title="内存区域详解"></a>内存区域详解</h1><h2 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h2><h3 id="线程私有的："><a href="#线程私有的：" class="headerlink" title="线程私有的："></a>线程私有的：</h3><ol>
+<li><strong><code>程序计数器</code></strong></li>
+</ol>
+<p>程序计数器是一块较小的<code>内存空间</code>，当前线程所执行的字节码的行号指示器。字节码解释器工作时通过<code>改变</code>这个<code>计数器的值</code>来选取下一条需要执行的<code>字节码指令</code>，分支、循环、跳转、异常处理、线程恢复等功能都需要依赖这个计数器来完成。</p>
+<p>程序计数器主要有<code>两个作用</code>：</p>
+<p>(1)<code>字节码解释器</code>通过改变程序计数器来依次读取指令，从而实现代码的流程控制，如：顺序执行、选择、循环、异常处理。</p>
+<p>(2)在多线程的情况下，程序计数器用于记录当前线程执行的位置，从而当线程被切换回来的时候能够知道该线程上次运行到哪儿了。</p>
+<p><strong><code>注意</code></strong> ：程序计数器是<code>唯一</code>一个<code>不会</code>出现 <code>OutOfMemoryError</code> 的内存区域，它的生命周期和线程相同</p>
+<br>
+
+<ol start="2">
+<li><strong><code>虚拟机栈</code></strong></li>
+</ol>
+<p>生命周期和线程相同，描述的是 Java 方法执行的内存模型，每次<code>方法调用</code>的<code>数据</code>都是通过<code>栈传递</code>的。</p>
+<p>Java 内存可以粗糙的区分为:<code>堆内存</code>（Heap）、<code>栈内存</code> (Stack)<br>栈也就是 Java 虚拟机栈，由一个个栈帧组成，而每个栈帧中都拥有：局部变量表、操作数栈、动态链接、方法出口信息。</p>
+<p>局部变量表主要存放了编译期可知的<code>各种数据类型</code>（boolean、byte、char、short、int、float、long、double）、<code>对象引用</code>（reference 类型，它不同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）。</p>
+<p>Java 虚拟机栈会出现 **<code>两种错误</code>**：</p>
+<p><code>StackOverFlowError</code>： 若 Java 虚拟机栈的内存大小不允许动态扩展，那么当线程请求栈的深度超过当前 Java 虚拟机栈的最大深度的时候，就抛出 StackOverFlowError 错误。</p>
+<p><code>OutOfMemoryError</code>： Java 虚拟机栈的内存大小可以动态扩展， 如果虚拟机在动态扩展栈时无法申请到足够的内存空间，则抛出<code>OutOfMemoryError</code>异常。</p>
+<br>
+
+<p><code>注： 方法/函数如何调用？</code></p>
+<p>Java 栈可以类比数据结构中<code>栈</code>，Java 栈中保存的主要内容是<code>栈帧</code>，每一次函数调用都会有一个对应的<code>栈帧被压入 Java 栈</code>，每一个函数<code>调用结束</code>后，都会有一个栈帧被<code>弹出</code>。</p>
+<br>
+
+<p>Java 方法有两种<code>返回方式</code>：(不管哪种返回方式都会导致栈帧被弹出。)</p>
+<p>(1)return 语句。</p>
+<p>(2)抛出异常。</p>
+<br>
+
+
+<ol start="3">
+<li><strong><code>本地方法栈</code></strong></li>
+</ol>
+<p>和虚拟机栈所发挥的作用非常相似，区别是： <code>虚拟机栈为虚拟机执行 Java 方法</code> （也就是字节码）服务，而<code>本地方法栈则为虚拟机使用到的 Native 方法</code>服务。 在 HotSpot 虚拟机中和 Java 虚拟机栈合二为一。</p>
+<p>本地方法被执行的时候，在<code>本地方法栈</code>也会<code>创建一个栈帧</code>，用于存放该本地方法的<code>局部变量表</code>、<code>操作数栈</code>、<code>动态链接</code>、<code>出口信息</code>。</p>
+<p>方法执行完毕后相应的栈帧也会出栈并释放内存空间，也会出现 <code>StackOverFlowError</code> 和 <code>OutOfMemoryError</code> 两种错误。</p>
+<br>
+
+<h3 id="线程共享的："><a href="#线程共享的：" class="headerlink" title="线程共享的："></a>线程共享的：</h3><ol>
+<li><strong><code>堆</code></strong></li>
+</ol>
+<p>Java 堆是<code>所有线程共享</code>的一块内存区域，在虚拟机启动时创建。此内存区域的唯一目的就是<code>存放对象实例</code>，几乎所有的对象实例以及数组都在这里分配内存。</p>
+<p>Java 堆是垃圾收集器管理的主要区域，因此也被称作 <code>GC 堆</code>（Garbage Collected Heap）。从垃圾回收的角度，由于现在收集器基本都采用分代垃圾收集算法，所以 Java 堆还可以细分为：<code>新生代</code>和<code>老年代</code>；进一步划分的目的是更好地回收内存，或者更快地分配内存。</p>
+<br>
+
+<h3 id="前期，堆内存被通常分为下面三部分："><a href="#前期，堆内存被通常分为下面三部分：" class="headerlink" title="前期，堆内存被通常分为下面三部分："></a>前期，堆内存被通常分为下面三部分：</h3><ul>
+<li><code>新生代</code>内存(Young Generation)</li>
+<li><code>老生代</code>(Old Generation)</li>
+<li><code>元空间</code>(Metaspace)  [JDK 8 版本之后 PermGen 已被 Metaspace(元空间) 取代,元空间使用的是直接内存。]</li>
+</ul>
+<p>堆这里最容易出现的就是 OutOfMemoryError 错误，并且出现这种错误之后的表现形式还会有几种，比如：</p>
+<p>java.lang.OutOfMemoryError: <code>GC Overhead Limit Exceeded</code> ： 当 JVM 花太多时间执行垃圾回收并且只能回收<code>很少的堆空间</code>时，就会发生此错误。</p>
+<p>java.lang.OutOfMemoryError: <code>Java heap space</code> :假如在创建新的对象时, 堆内存中的空间不足以存放新创建的对象, 就会引发此错误。(和配置的最大堆内存有关，且<code>受制于物理内存大小</code>。</p>
+<br>
+
+<ol start="2">
+<li><strong><code>方法区</code></strong></li>
+</ol>
+<p>与 Java 堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。虽然 Java 虚拟机规范把<code>方法区</code>描述为堆的一个<code>逻辑</code>部分，但是它却有一个别名叫做 <code>Non-Heap</code>（非堆），目的应该是与 Java 堆区分开来。</p>
+<p>方法区和永久代的关系很像 Java 中接口和类的关系，类实现了接口，而<code>永久代</code>就是 HotSpot 虚拟机对虚拟机规范中<code>方法区</code>的一种<code>实现</code>方式。 也就是说，永久代是 HotSpot 的概念，方法区是 Java 虚拟机规范中的定义</p>
+<br>
+
+<h3 id="为什么要将永久代-PermGen-替换为元空间-MetaSpace-呢"><a href="#为什么要将永久代-PermGen-替换为元空间-MetaSpace-呢" class="headerlink" title="为什么要将永久代 (PermGen) 替换为元空间 (MetaSpace) 呢?"></a>为什么要将永久代 (PermGen) 替换为元空间 (MetaSpace) 呢?</h3><p>(1)整个<code>永久代</code>有一个 JVM 本身设置的固定大小上限，<code>无法进行调整</code>，而<code>元空间</code>使用的是<code>直接内存</code>，受本机可用内存的限制，虽然元空间仍旧可能溢出，但是比原来出现的几率会更小。</p>
+<p>当元空间溢出时会得到如下错误： java.lang.OutOfMemoryError: MetaSpace</p>
+<p>你可以使用 -XX：MaxMetaspaceSize 标志设置最大元空间大小，默认值为 unlimited，这意味着它只受系统内存的限制。-XX：MetaspaceSize 调整标志定义元空间的初始大小如果未指定此标志，则 Metaspace 将根据运行时的应用程序需求动态地重新调整大小。</p>
+<p>(2)元空间里面存放的是<code>类的元数据</code>，这样加载多少类的元数据就不由 MaxPermSize 控制了, 而由系统的实际可用空间来控制，这样能加载的类就更多了。</p>
+<p>(3)在 JDK8，合并 HotSpot 和 JRockit 的代码时, JRockit 从来没有一个叫永久代的东西, 合并之后就没有必要额外的设置这么一个永久代的地方了。</p>
+<br>
+
+<h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><p>运行时常量池是方法区的一部分。Class 文件中除了有类的版本、字段、方法、接口等描述信息外，还有常量池表（用于存放编译期生成的各种字面量和符号引用）</p>
+<p>既然运行时常量池是方法区的一部分，自然受到方法区内存的限制，当常量池无法再申请到内存时会抛出 <code>OutOfMemoryError </code>错误。</p>
+<p>JDK1.8 hotspot 移除了永久代用元空间(Metaspace)取而代之, 这时候<code>字符串常量池还在堆</code>, <code>运行时常量池还在方法区</code>, 只不过方法区的实现从永久代变成了元空间(Metaspace)</p>
+<br>
+
+
+<ol start="3">
+<li><strong><code>直接内存</code></strong> (非运行时数据区的一部分)</li>
+</ol>
+<p>直接内存并<code>不是</code>虚拟机运行时<code>数据区</code>的一部分，也<code>不是</code>虚拟机规范中定义的<code>内存区域</code>，但是这部分内存也被频繁地使用。而且也可能导致 <code>OutOfMemoryError</code> 错误出现。</p>
+<p>JDK1.4 中新加入的 NIO(New Input/Output) 类，引入了一种基于通道（Channel）与缓存区（Buffer）的 I/O 方式，它可以直接使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆中的 DirectByteBuffer 对象作为这块内存的引用进行操作。这样就能在一些场景中显著提高性能，因为避免了在 Java 堆和 Native 堆之间来回复制数据。</p>
+<p>本机直接内存的分配不会受到 Java 堆的限制，但是，既然是内存就会受到本机总内存大小以及处理器寻址空间的限制。</p>
+<br>
+<br>
+
+<h1 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h1><h2 id="Step1-类加载检查"><a href="#Step1-类加载检查" class="headerlink" title="Step1:类加载检查"></a>Step1:类加载检查</h2><p>虚拟机遇到一条 <code>new</code> 指令时，首先将去检查这个指令的参数是否能在<code>常量池</code>中定位到这个类的<code>符号引用</code>，并且检查这个符号引用代表的类<code>是否已被加载过、解析和初始化过</code>。如果没有，那必须先执行相应的<code>类加载过程</code>。</p>
+<br>
+
+<h2 id="Step2-分配内存"><a href="#Step2-分配内存" class="headerlink" title="Step2:分配内存"></a>Step2:分配内存</h2><p>在类加载检查通过后，接下来虚拟机将为<code>新生对象分配内存</code>。对象所需的内存大小在类加载完成后便可确定，为对象分配空间的任务等同于把一块确定大小的内存从 <code>Java 堆</code>中划分出来。分配方式有 “<code>指针碰撞</code>” 和 “<code>空闲列表</code>” 两种，选择哪种分配方式由 Java 堆<code>是否规整</code>决定，而 Java 堆是否规整又由所采用的垃圾收集器<code>是否带有压缩整理功能</code>决定。</p>
+<h3 id="内存分配的两种方式-（补充内容，需要掌握）："><a href="#内存分配的两种方式-（补充内容，需要掌握）：" class="headerlink" title="内存分配的两种方式 （补充内容，需要掌握）："></a>内存分配的两种方式 （补充内容，需要掌握）：</h3><p><strong><code>指针碰撞</code></strong> ：</p>
+<ul>
+<li>适用场合 ：堆内存<code>规整</code>（即没有内存碎片）的情况下。</li>
+<li>原理 ：过的内存全部整合到一边，没有用过的内存放在另一边，中间有一个分界指针，只需要向着没用过的内存方向将该指针移动对象内存大小位置即可。</li>
+<li>使用该分配方式的 GC 收集器：Serial, ParNew</li>
+</ul>
+<p><strong><code>空闲列表</code></strong> ：</p>
+<ul>
+<li>适用场合 ： 堆内存<code>不规整</code>的情况下。</li>
+<li>原理 ：虚拟机会维护一个列表，该列表中会记录哪些内存块是可用的，在分配的时候，找一块儿足够大的内存块儿来划分给对象实例，最后更新列表记录。</li>
+<li>使用该分配方式的 GC 收集器：CMS</li>
+</ul>
+<p>选择以上两种方式中的哪一种，取决于 Java 堆内存<code>是否规整</code>。而 Java 堆内存是否规整，取决于 GC 收集器的算法是”<code>标记-清除</code>“，还是”<code>标记-整理</code>“（也称作”标记-压缩”），值得注意的是，复制算法内存也是规整的。</p>
+<br>
+
+<h3 id="内存分配并发问题（补充内容，需要掌握）"><a href="#内存分配并发问题（补充内容，需要掌握）" class="headerlink" title="内存分配并发问题（补充内容，需要掌握）"></a>内存分配并发问题（补充内容，需要掌握）</h3><p>在创建对象的时候有一个很重要的问题，就是线程安全，因为在实际开发过程中，创建对象是很频繁的事情，作为虚拟机来说，必须要保证线程是安全的，通常来讲，虚拟机采用两种方式来保证线程安全：</p>
+<ul>
+<li><p><strong>CAS+失败重试</strong>： CAS 是乐观锁的一种实现方式。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。**<code>虚拟机采用 CAS 配上失败重试的方式保证更新操作的原子性</code>**。</p>
+</li>
+<li><p><strong>TLAB</strong>： 为每一个线程预先在 Eden 区分配一块儿内存，JVM 在给线程中的对象分配内存时，首先在 TLAB 分配，当对象大于 TLAB 中的剩余内存或 TLAB 的内存已用尽时，再采用上述的 CAS 进行内存分配</p>
+</li>
+</ul>
+<br>
+
+<h2 id="Step3-初始化零值"><a href="#Step3-初始化零值" class="headerlink" title="Step3:初始化零值"></a>Step3:初始化零值</h2><p>内存分配完成后，虚拟机需要将分配到的内存空间都初始化为零值（不包括对象头），这一步操作保证了对象的实例字段在 Java 代码中可以不赋初始值就直接使用，程序能访问到这些字段的数据类型所对应的零值。</p>
+<br>
+
+<h2 id="Step4-设置对象头"><a href="#Step4-设置对象头" class="headerlink" title="Step4:设置对象头"></a>Step4:设置对象头</h2><p>初始化零值完成之后，<strong>虚拟机要对对象进行必要的设置</strong>，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的 GC 分代年龄等信息。 <strong>这些信息存放在对象头中</strong>。 另外，根据虚拟机当前运行状态的不同，如是否启用偏向锁等，对象头会有不同的设置方式。</p>
+<br>
+
+<h2 id="Step5-执行-init-方法"><a href="#Step5-执行-init-方法" class="headerlink" title="Step5:执行 init 方法"></a>Step5:执行 init 方法</h2><p>在上面工作都完成之后，从虚拟机的视角来看，一个新的对象已经产生了，但从 Java 程序的视角来看，对象创建才刚开始，<code>&lt;init&gt; </code>方法还没有执行，所有的字段都还为零。所以一般来说，执行 new 指令之后会接着执行<code>&lt;init&gt;</code>方法，把对象按照程序员的意愿进行初始化，这样一个真正可用的对象才算完全产生出来。</p>
+<br>
+
+<h1 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h1><p>在 Hotspot 虚拟机中，对象在内存中的布局可以分为 3 块区域：<code>对象头</code>、<code>实例数据</code>和<code>对齐填充</code>。</p>
+<p>Hotspot 虚拟机的<code>对象头</code>包括两部分信息，第一部分用于<code>存储对象自身的运行时数据</code>（哈希码、GC 分代年龄、锁状态标志等等），另一部分是<code>类型指针</code>，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<p><code>实例数据部分是对象真正存储的有效信息</code>，也是在程序中所定义的各种类型的字段内容。</p>
+<p><code>对齐填充部分不是必然存在的，也没有什么特别的含义，仅仅起占位作用</code>。 因为 Hotspot 虚拟机的自动内存管理系统要求对象起始地址必须是 8 字节的整数倍，换句话说就是对象的大小必须是 8 字节的整数倍。而对象头部分正好是 8 字节的倍数（1 倍或 2 倍），因此，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全。</p>
+<br>
+
+<h1 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h1><p>建立对象就是为了使用对象，我们的 Java 程序通过栈上的 reference 数据来操作堆上的具体对象。对象的访问方式由虚拟机实现而定，目前主流的访问方式有：使用句柄、直接指针。</p>
+<h2 id="句柄"><a href="#句柄" class="headerlink" title="句柄"></a>句柄</h2><p>如果使用句柄的话，那么 <code>Java 堆</code>中将会划分出一块内存来作为<code>句柄池</code>，<code>reference</code> 中存储的就是对象的<code>句柄地址</code>，而句柄中包含了<code>对象实例数据与类型数据</code>各自的具体<code>地址</code>信息。</p>
+<br>
+
+<h2 id="直接指针"><a href="#直接指针" class="headerlink" title="直接指针"></a>直接指针</h2><p>如果使用直接指针访问，那么 Java 堆对象的布局中就必须考虑如何放置访问类型数据的相关信息，而 reference 中存储的直接就是对象的地址。</p>
+<p>使用句柄来访问的最大好处是 <code>reference</code> 中存储的是稳定的<code>句柄地址</code>，在对象被移动时只会改变句柄中的<code>实例数据指针</code>，而 reference 本身不需要修改。使用直接指针访问方式最大的好处就是<code>速度快</code>，它节省了一次指针定位的时间开销。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>JVM-内存</p><p><a href="https://wanyne-max.github.io/2022/02/02/JVM-内存/">https://wanyne-max.github.io/2022/02/02/JVM-内存/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Wanyne W</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2022-02-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2022-04-05</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/JVM/">JVM</a></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2022/02/02/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">JVM-垃圾回收</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2022/02/02/Spring/"><span class="level-item">Spring</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="Wanyne W"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Wanyne W</p><p class="is-size-6 is-block">所有命运的馈赠 早已暗中标注了价格</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">33</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">9</p></a></div></div></nav></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Blog/"><span class="level-start"><span class="level-item">Blog</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/Git/"><span class="level-start"><span class="level-item">Git</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/Redis/"><span class="level-start"><span class="level-item">Redis</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/SQL/"><span class="level-start"><span class="level-item">SQL</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/"><span class="level-start"><span class="level-item">知识区</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C/"><span class="level-start"><span class="level-item">网络</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2022/02/"><span class="level-start"><span class="level-item">二月 2022</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/01/"><span class="level-start"><span class="level-item">一月 2022</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/10/"><span class="level-start"><span class="level-item">十月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">13</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">JVM-垃圾回收</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%86%85%E5%AD%98/">JVM-内存</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Spring/">Spring</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Redis/">Redis</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/SpringBoot/">SpringBoot</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a><p class="is-size-7">   <span>&copy; 2022 Wanyne W</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">Made by Wanyne W</p><p class="is-size-7">Hope you have a good day！ ♥</p><p class="is-size-7">Creation date : 2021 08 05</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

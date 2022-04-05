@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>集合 - Wanyne&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Wanyne&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wanyne&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="Java 4种数组复制方式System.arraycopy &amp;gt; clone &amp;gt; Arrays.copyOf &amp;gt; for"><meta property="og:type" content="blog"><meta property="og:title" content="集合"><meta property="og:url" content="https://wanyne-max.github.io/2022/02/02/%E9%9B%86%E5%90%88/"><meta property="og:site_name" content="Wanyne&#039;s Blog"><meta property="og:description" content="Java 4种数组复制方式System.arraycopy &amp;gt; clone &amp;gt; Arrays.copyOf &amp;gt; for"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://raw.githubusercontent.com/wanyne-max/image-host/master/java/Hash.2s281gsyac60.webp"><meta property="article:published_time" content="2022-02-01T18:22:22.000Z"><meta property="article:modified_time" content="2022-04-05T02:34:46.147Z"><meta property="article:author" content="Wanyne W"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://raw.githubusercontent.com/wanyne-max/image-host/master/java/Hash.2s281gsyac60.webp"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://wanyne-max.github.io/2022/02/02/%E9%9B%86%E5%90%88/"},"headline":"集合","image":["https://raw.githubusercontent.com/wanyne-max/image-host/master/java/Hash.2s281gsyac60.webp"],"datePublished":"2022-02-01T18:22:22.000Z","dateModified":"2022-04-05T02:34:46.147Z","author":{"@type":"Person","name":"Wanyne W"},"publisher":{"@type":"Organization","name":"Wanyne's Blog","logo":{"@type":"ImageObject","url":"https://wanyne-max.github.io/img/logo.svg"}},"description":"Java 4种数组复制方式System.arraycopy &gt; clone &gt; Arrays.copyOf &gt; for"}</script><link rel="canonical" href="https://wanyne-max.github.io/2022/02/02/%E9%9B%86%E5%90%88/"><link rel="icon" href="/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.15.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/pace/1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-02-01T18:22:22.000Z" title="2022/2/2 上午2:22:22">2022-02-02</time>发表</span><span class="level-item"><time dateTime="2022-04-05T02:34:46.147Z" title="2022/4/5 上午10:34:46">2022-04-05</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></span><span class="level-item">29 分钟读完 (大约4299个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">集合</h1><div class="content"><h1 id="Java-4种数组复制方式"><a href="#Java-4种数组复制方式" class="headerlink" title="Java 4种数组复制方式"></a>Java 4种数组复制方式</h1><p><code>System.arraycopy</code> &gt; <code>clone</code> &gt; <code>Arrays.copyOf </code>&gt; <code>for</code></p>
+<br>
+
+<p><escape><span id="more"></span></escape> </p>
+<h2 id="List-Set-Queue-Map-四者的区别？"><a href="#List-Set-Queue-Map-四者的区别？" class="headerlink" title="List, Set, Queue, Map 四者的区别？"></a>List, Set, Queue, Map 四者的区别？</h2><ul>
+<li><code>List</code>(对付顺序的好帮手): 存储的元素是<code>有序</code>的、<code>可重复</code>的。</li>
+<li><code>Set</code>(注重独一无二的性质): 存储的元素是<code>无序</code>的、<code>不可重复</code>的。</li>
+<li><code>Queue</code>(实现排队功能的叫号机): 按<code>特定的排队规则</code>来确定先后顺序，存储的元素是<code>有序</code>的、<code>可重复</code>的。</li>
+<li><code>Map</code>(用 key 来搜索的专家): 使用<code>键值对</code>（key-value）存储，类似于数学上的函数 y=f(x)，”x” 代表 key，”y” 代表 value，<code>key</code> 是<code>无序</code>的、<code>不可重复</code>的，value 是<code>无序</code>的、<code>可重复</code>的，<code>每个键最多映射到一个值</code>。</li>
+</ul>
+<br>
+
+<h1 id="集合框架底层数据结构"><a href="#集合框架底层数据结构" class="headerlink" title="集合框架底层数据结构"></a>集合框架底层数据结构</h1><h2 id="List"><a href="#List" class="headerlink" title="List"></a>List</h2><ul>
+<li><code>Arraylist</code>： Object[ ] 数组</li>
+<li><code>Vector</code>：Object[ ] 数组</li>
+<li><code>LinkedList</code>： 双向链表(JDK1.6 之前为循环链表，JDK1.7 取消了循环)</li>
+</ul>
+<h2 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h2><ul>
+<li><code>HashSet</code>(<code>无序，唯一</code>): 基于 HashMap 实现的，底层采用 HashMap 来保存元素</li>
+<li><code>LinkedHashSet</code>: LinkedHashSet 是 HashSet 的子类，并且其内部是通过 LinkedHashMap 来实现的。有点类似于我们之前说的 LinkedHashMap 其内部是基于 HashMap 实现一样，不过还是有一点点区别的</li>
+<li><code>TreeSet</code>(<code>有序，唯一</code>): 红黑树(自平衡的排序二叉树)</li>
+</ul>
+<h2 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h2><ul>
+<li><code>PriorityQueue</code>: Object[] <code>数组</code>来实现二叉堆</li>
+<li><code>ArrayQueue</code>: Object[] <code>数组 + 双指针</code></li>
+</ul>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><ul>
+<li><code>HashMap</code>： JDK1.8 之前 HashMap 由数组+链表组成的，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的（“拉链法”解决冲突）。JDK1.8 以后在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间</li>
+<li><code>LinkedHashMap</code>： LinkedHashMap 继承自 HashMap，所以它的底层仍然是基于<code>拉链式散列结构</code>即由<code>数组和链表</code>或<code>红黑树</code>组成。另外，LinkedHashMap 在上面结构的基础上，增加了一条<code>双向链表</code>，使得上面的结构可以保持键值对的插入顺序。同时通过对链表进行相应的操作，实现了访问顺序相关逻辑。</li>
+<li><code>Hashtable</code>： <code>数组+链表</code>组成的，数组是 Hashtable 的主体，链表则是主要为了解决哈希冲突而存在的</li>
+<li><code>TreeMap</code>： 红黑树（自平衡的排序二叉树）</li>
+</ul>
+<h2 id="如何选集合"><a href="#如何选集合" class="headerlink" title="如何选集合"></a>如何选集合</h2><p>需要根据<code>键值</code>获取到元素值时就选用 <code>Map 接口</code>下的集合，需要<code>排序</code>时选择 <code>TreeMap</code>,<code>不需要排序</code>时就选择 <code>HashMap</code>,需要保证<code>线程安全</code>就选用 <code>ConcurrentHashMap</code>。</p>
+<p>当我们只需要<code>存放</code>元素值时，就选择实现<code>Collection</code> 接口的集合，需要保证<code>元素唯一</code>时选择实现 <code>Set</code> 接口的集合比如 <code>TreeSet 或 HashSet</code>，<code>不需要</code>就选择实现 <code>List</code> 接口的比如 <code>ArrayList 或 LinkedList</code>，然后再根据实现这些接口的集合的特点来选用。</p>
+<br>
+
+<h1 id="List-1"><a href="#List-1" class="headerlink" title="List"></a>List</h1><h2 id="Arraylist-和-Vector-的区别"><a href="#Arraylist-和-Vector-的区别" class="headerlink" title="Arraylist 和 Vector 的区别?"></a>Arraylist 和 Vector 的区别?</h2><ul>
+<li><code>ArrayList</code> 是 List 的主要实现类，底层使用 Object[ ]存储，适用于频繁的查找工作，线程不安全 ；</li>
+<li><code>Vector</code> 是 List 的古老实现类，底层使用Object[ ] 存储，线程安全的。</li>
+</ul>
+<h2 id="Arraylist-与-LinkedList-区别"><a href="#Arraylist-与-LinkedList-区别" class="headerlink" title="Arraylist 与 LinkedList 区别?"></a>Arraylist 与 LinkedList 区别?</h2><p>1.是否保证<code>线程安全</code>： ArrayList 和 LinkedList 都是不同步的，也就是不保证线程安全；</p>
+<p>2.底层<code>数据结构</code>： Arraylist 底层使用的是 <code>Object 数组</code>；LinkedList 底层使用的是 <code>双向链表</code> 数据结构（JDK1.6 之前为循环链表，JDK1.7 取消了循环。注意双向链表和双向循环链表的区别，下面有介绍到！）</p>
+<p>3.<code>插入和删除</code>是否受元素位置的影响：</p>
+<ul>
+<li><code>ArrayList</code> 采用<code>数组</code>存储，所以插入和删除元素的时间复杂度受元素位置的影响。 比如：执行add(E e)方法的时候， <code>ArrayList</code> 会默认在将指定的元素追加到此列表的末尾，这种情况时间复杂度就是 O(1)。但是如果要在指定位置 i 插入和删除元素的话（<code>add(int index, E element)</code>）时间复杂度就为 O(n-i)。因为在进行上述操作的时候集合中第 i 和第 i 个元素之后的(n-i)个元素都要执行向后位/向前移一位的操作。</li>
+<li><code>LinkedList</code> 采用<code>链表</code>存储，所以，如果是在头尾插入或者删除元素不受元素位置的影响（add(E e)、addFirst(E e)、addLast(E e)、removeFirst() 、 removeLast()），近似 O(1)，如果是要在指定位置 i 插入和删除元素的话（add(int index, E element)，remove(Object o)） 时间复杂度近似为 O(n) ，因为需要先移动到指定位置再插入。</li>
+</ul>
+<p>4.是否支持<code>快速随机访问</code>： LinkedList 不支持高效的随机元素访问，而 ArrayList 支持。快速随机访问就是通过元素的序号快速获取元素对象(对应于get(int index)方法)。</p>
+<p>5.内存空间占用： ArrayList 的空间浪费主要体现在在 list 列表的<code>结尾会预留</code>一定的容量空间，而 LinkedList 的空间花费则体现在它的每一个<code>元素</code>都需要消耗比 ArrayList 更多的<code>空间</code>（因为要存放直接后继和直接前驱以及数据）。</p>
+<br>
+
+<h1 id="set"><a href="#set" class="headerlink" title="set"></a>set</h1><h2 id="comparable-和-Comparator-的区别"><a href="#comparable-和-Comparator-的区别" class="headerlink" title="comparable 和 Comparator 的区别"></a>comparable 和 Comparator 的区别</h2><ul>
+<li><code>comparable</code> 接口实际上是出自java.lang包 它有一个 <code>compareTo(Object obj)</code>方法用来排序</li>
+<li><code>comparator</code>接口实际上是出自 java.util 包它有一个<code>compare(Object obj1, Object obj2)</code>方法用来排序</li>
+</ul>
+<p>一般我们需要对一个集合使用自定义排序时，我们就要重写compareTo()方法或compare()方法，当我们需要对某一个集合实现<code>两种排序</code>方式，比如一个 song 对象中的歌名和歌手名分别采用一种排序方法的话，我们可以重写<code>compareTo()</code>方法和使用自制的<code>Comparator</code>方法或者以<code>两个 Comparator </code>来实现歌名排序和歌星名排序，第二种代表我们只能使用<code>两个参数版的 Collections.sort()</code>.</p>
+<h2 id="无序性和不可重复性的含义是什么"><a href="#无序性和不可重复性的含义是什么" class="headerlink" title="无序性和不可重复性的含义是什么"></a>无序性和不可重复性的含义是什么</h2><p>1、无序性不等于随机性 ，无序性是指存储的数据在底层数组中并非按照数组索引的顺序添加 ，而是根据数据的<code>哈希值</code>决定的。</p>
+<p>2、不可重复性是指添加的元素按照 equals()判断时 ，返回 false，需要<code>同时重写 equals()方法和 HashCode()方法</code>。</p>
+<h2 id="HashSet、LinkedHashSet-和-TreeSet-三者的异同"><a href="#HashSet、LinkedHashSet-和-TreeSet-三者的异同" class="headerlink" title="HashSet、LinkedHashSet 和 TreeSet 三者的异同"></a>HashSet、LinkedHashSet 和 TreeSet 三者的异同</h2><ul>
+<li>HashSet、LinkedHashSet 和 TreeSet 都是 Set 接口的实现类，都能保证<code>元素唯一</code>，并且都<code>不是线程安全的</code>。</li>
+<li>HashSet、LinkedHashSet 和 TreeSet 的主要区别在于底层数据结构不同。<code>HashSet</code> 的底层数据结构是<code>哈希表</code>（基于 HashMap 实现）。<code>LinkedHashSet</code> 的底层数据结构是<code>链表和哈希表</code>，元素的插入和取出顺序满足 <code>FIFO</code>。<code>TreeSet</code> 底层数据结构是<code>红黑树</code>，元素是<code>有序</code>的，排序的方式有<code>自然排序和定制排序</code>。</li>
+<li>底层数据结构不同又导致这三者的应用场景不同。<code>HashSet</code> 用于<code>不需要保证</code>元素插入和取出顺序的场景，<code>LinkedHashSet </code>用于<code>保证</code>元素的插入和取出顺序满足 FIFO 的场景，<code>TreeSet</code> 用于支持对元素<code>自定义排序</code>规则的场景。</li>
+</ul>
+<br>
+
+<h1 id="Queue-1"><a href="#Queue-1" class="headerlink" title="Queue"></a>Queue</h1><h2 id="Queue-与-Deque-的区别"><a href="#Queue-与-Deque-的区别" class="headerlink" title="Queue 与 Deque 的区别"></a>Queue 与 Deque 的区别</h2><ul>
+<li>Queue 是<code>单端</code>队列，只能从一端插入元素，另一端删除元素，实现上一般遵循 先进先出（FIFO） 规则。</li>
+<li>Queue 扩展了 Collection 的接口，根据 因为容量问题而导致操作失败后处理方式的不同 可以分为两类方法: 一种在操作失败后会<code>抛出异常</code>，另一种则会<code>返回特殊值</code>。</li>
+<li>Deque 是<code>双端</code>队列，在队列的两端均可以插入或删除元素。</li>
+<li>Deque 扩展了 Queue 的接口, 增加了在队首和队尾进行插入和删除的方法，同样根据失败后处理方式的不同分为两类</li>
+</ul>
+<h2 id="ArrayDeque-与-LinkedList-的区别"><a href="#ArrayDeque-与-LinkedList-的区别" class="headerlink" title="ArrayDeque 与 LinkedList 的区别"></a>ArrayDeque 与 LinkedList 的区别</h2><p><code>ArrayDeque</code> 是基于<code>可变长的数组和双指针</code>来实现，而 <code>LinkedList</code> 则通过<code>链表</code>来实现。</p>
+<p>ArrayDeque <code>不支持</code>存储 <code>NULL</code> 数据，但 LinkedList <code>支持</code>。</p>
+<p>ArrayDeque 插入时可能存在<code>扩容</code>过程, 不过均摊后的插入操作依然为 O(1)。虽然 LinkedList <code>不需要扩容</code>，但是每次插入数据时均需要<code>申请新的堆空间</code>，均摊性能相比<code>更慢</code>。</p>
+<p>从性能的角度上，选用 ArrayDeque 来实现队列要比 LinkedList 更好。此外，<code>ArrayDeque </code>也可以用于实现<code>栈</code>。</p>
+<h2 id="PriorityQueue"><a href="#PriorityQueue" class="headerlink" title="PriorityQueue"></a>PriorityQueue</h2><p><code>PriorityQueue</code> 与 <code>Queue</code> 的区别在于元素出队顺序是与优先级相关的，即总是<code>优先级最高</code>的元素<code>先出队</code>。</p>
+<ul>
+<li>PriorityQueue 利用了<code>二叉堆</code>的数据结构来实现的，底层使用<code>可变长的数组</code>来存储数据</li>
+<li>PriorityQueue 通过堆元素的上浮和下沉，实现了在 O(logn) 的时间复杂度内插入元素和删除堆顶元素。</li>
+<li>PriorityQueue 是<code>非线程安全</code>的，且<code>不支持存储 NULL</code> 和 <code>non-comparable</code> 的对象。</li>
+<li>PriorityQueue 默认是<code>小顶堆</code>，但可以接收一个 Comparator 作为构造参数，从而来自定义元素<code>优先级</code>的先后。</li>
+</ul>
+<p>PriorityQueue 在面试中可能更多的会出现在堆排序、求第K大的数、带权图的遍历等。</p>
+<br>
+
+<h1 id="Map-接口"><a href="#Map-接口" class="headerlink" title="Map 接口"></a>Map 接口</h1><h2 id="HashMap-和-Hashtable-的区别"><a href="#HashMap-和-Hashtable-的区别" class="headerlink" title="HashMap 和 Hashtable 的区别"></a>HashMap 和 Hashtable 的区别</h2><p>1.<code>线程是否安全</code>： <code>HashMap</code> 是<code>非线程安全</code>的，<code>Hashtable</code> 是<code>线程安全</code>的,因为 Hashtable 内部的方法基本都经过synchronized 修饰。（如果你要保证线程安全的话就使用 ConcurrentHashMap 吧！）；</p>
+<p>2.<code>效率</code>： 因为线程安全的问题，HashMap 要比 Hashtable 效率高一点。另外，Hashtable 基本被淘汰，不要在代码中使用它；</p>
+<p>3.对 Null key 和 Null value 的支持：<code> HashMap 可以存储 null</code> 的 key 和 value，但 <code>null 作为键只能有一个</code>，null 作为值可以有多个；<code>Hashtable 不允许有 null 键和 null 值</code>，否则会抛出 NullPointerException。</p>
+<p>4.<code>初始</code>容量大小和每次<code>扩充</code>容量大小的不同 ： </p>
+<ul>
+<li>① 创建时如果不指定容量初始值，Hashtable 默认的初始大小为 11，之后每次扩充，容量变为原来的 2n+1。HashMap 默认的初始化大小为 16。之后每次扩充，容量变为原来的 2 倍。</li>
+<li>② 创建时如果给定了容量初始值，那么 Hashtable 会直接使用你给定的大小，而 HashMap 会将其扩充为 2 的幂次方大小（HashMap 中的tableSizeFor()方法保证，下面给出了源代码）。也就是说 HashMap 总是使用 2 的幂作为哈希表的大小,后面会介绍到为什么是 2 的幂次方。</li>
+</ul>
+<p>5.<code>底层数据结构</code>： JDK1.8 以后的 HashMap 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为 8）（将链表转换成红黑树前会判断，如果当前数组的长度小于 64，那么会选择先进行数组扩容，而不是转换为红黑树）时，将链表转化为红黑树，以减少搜索时间。Hashtable 没有这样的机制。</p>
+<h2 id="HashMap-和-HashSet-区别"><a href="#HashMap-和-HashSet-区别" class="headerlink" title="HashMap 和 HashSet 区别"></a>HashMap 和 HashSet 区别</h2><p><img src="https://raw.githubusercontent.com/wanyne-max/image-host/master/java/Hash.2s281gsyac60.webp" alt="Hash"></p>
+<h2 id="HashSet-如何检查重复"><a href="#HashSet-如何检查重复" class="headerlink" title="HashSet 如何检查重复"></a>HashSet 如何检查重复</h2><p>当你把对象加入HashSet时，HashSet 会先<code>计算</code>对象的<code>hashcode值</code>来判断对象加入的位置，同时也会与其他加入的对象的 hashcode 值<code>作比较</code>，如果<code>没有相符</code>的 hashcode，HashSet 会假设对象<code>没有重复</code>出现。但是如果发现<code>有相同 </code>hashcode 值的对象，这时会<code>调用equals()</code>方法来检查 hashcode 相等的<code>对象</code>是否真的相同。如果两者<code>相同</code>，HashSet 就<code>不会</code>让加入操作成功。</p>
+<h2 id="hashCode-与-equals-的相关规定："><a href="#hashCode-与-equals-的相关规定：" class="headerlink" title="hashCode()与 equals() 的相关规定："></a>hashCode()与 equals() 的相关规定：</h2><ol>
+<li>如果两个<code>对象相等</code>，则 <code>hashcode</code> 一定也是<code>相同</code>的</li>
+<li>两个<code>对象相等</code>,对两个 <code>equals()</code> 方法返回 <code>true</code></li>
+<li>两个对象有<code>相同的 hashcode</code> 值，它们也<code>不一定</code>是相等的</li>
+<li>综上，equals() 方法被覆盖过，则 hashCode() 方法也必须被覆盖</li>
+<li>hashCode()的默认行为是对堆上的对象产生独特值。如果<code>没有重写</code> hashCode()，则该 class 的两个对象<code>无论如何都不会相等</code>（即使这两个对象指向相同的数据）。</li>
+</ol>
+<h2 id="HashMap-的底层实现"><a href="#HashMap-的底层实现" class="headerlink" title="//HashMap 的底层实现"></a>//HashMap 的底层实现</h2><br>
+
+<h2 id="HashMap-多线程操作导致死循环问题"><a href="#HashMap-多线程操作导致死循环问题" class="headerlink" title="HashMap 多线程操作导致死循环问题"></a>HashMap 多线程操作导致死循环问题</h2><p>主要原因在于并发下的 <code>Rehash</code> 会造成元素之间会<code>形成一个循环链表</code>。不过，jdk 1.8 后解决了这个问题，但是还是不建议在多线程下使用 HashMap,因为多线程下使用 <code>HashMap</code> 还是会存在其他问题比如<code>数据丢失</code>。并发环境下推荐使用 <code>ConcurrentHashMap</code> 。</p>
+<h2 id="ConcurrentHashMap-和-Hashtable-的区别"><a href="#ConcurrentHashMap-和-Hashtable-的区别" class="headerlink" title="ConcurrentHashMap 和 Hashtable 的区别"></a>ConcurrentHashMap 和 Hashtable 的区别</h2><p><code>底层数据结构</code>： JDK1.7 的 ConcurrentHashMap 底层采用 分段的数组+链表 实现，JDK1.8 采用的数据结构跟 HashMap1.8 的结构一样，数组+链表/红黑二叉树。Hashtable 和 JDK1.8 之前的 HashMap 的底层数据结构类似都是采用 数组+链表 的形式，数组是 HashMap 的主体，链表则是主要为了解决哈希冲突而存在的；<br>实现<code>线程安全</code>的方式（重要）： </p>
+<ul>
+<li><p>① 在 JDK1.7 的时候，<code>ConcurrentHashMap</code>（分段锁） 对整个桶数组进行了<code>分割分段</code>(Segment)，每一把锁只锁容器其中一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。 到了 JDK1.8 的时候已经摒弃了 Segment 的概念，而是直接用 <code>Node 数组+链表+红黑树</code>的数据结构来实现，并发控制使用 <code>synchronized</code> 和 <code>CAS</code> 来操作。（JDK1.6 以后 对 synchronized 锁做了很多优化） 整个看起来就像是优化过且线程安全的 HashMap，虽然在 JDK1.8 中还能看到 Segment 的数据结构，但是已经简化了属性，只是为了兼容旧版本；</p>
+</li>
+<li><p>② <code>Hashtable</code>(同一把锁) :使用 <code>synchronized</code> 来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如使用 put 添加元素，另一个线程不能使用 put 添加元素，也不能使用 get，竞争会越来越激烈效率越低。</p>
+</li>
+</ul>
+<br>
+
+<h1 id="Collections-工具类"><a href="#Collections-工具类" class="headerlink" title="Collections 工具类"></a>Collections 工具类</h1><h2 id="排序操作"><a href="#排序操作" class="headerlink" title="排序操作"></a>排序操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(List list)</span>  <span class="comment">//反转</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">shuffle</span><span class="params">(List list)</span>  <span class="comment">//随机排序</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(List list)</span>     <span class="comment">//按自然排序的升序排序</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(List list, Comparator c)</span>  <span class="comment">//定制排序，由Comparator控制排序逻辑</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(List list, <span class="keyword">int</span> i , <span class="keyword">int</span> j)</span> <span class="comment">//交换两个索引位置的元素</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rotate</span><span class="params">(List list, <span class="keyword">int</span> distance)</span><span class="comment">//旋转。当distance为正数时，将list后distance个元素整体移到前面。当distance为负数时，将 list的前distance个元素整体移到后面</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="查找-替换操作"><a href="#查找-替换操作" class="headerlink" title="查找,替换操作"></a>查找,替换操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(List list, Object key)</span><span class="comment">//对List进行二分查找，返回索引，注意List必须是有序的</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">(Collection coll)</span><span class="comment">//根据元素的自然顺序，返回最大的元素。 类比int min(Collection coll)</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">(Collection coll, Comparator c)</span><span class="comment">//根据定制排序，返回最大元素，排序规则由Comparatator类控制。类比int min(Collection coll, Comparator c)</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">fill</span><span class="params">(List list, Object obj)</span><span class="comment">//用指定的元素代替指定list中的所有元素</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">frequency</span><span class="params">(Collection c, Object o)</span><span class="comment">//统计元素出现次数</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">indexOfSubList</span><span class="params">(List list, List target)</span><span class="comment">//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)</span></span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">replaceAll</span><span class="params">(List list, Object oldVal, Object newVal)</span><span class="comment">//用新元素替换旧元素</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="同步控制"><a href="#同步控制" class="headerlink" title="同步控制"></a>同步控制</h2><p>最好不要用下面这些方法，效率非常低，需要线程安全的集合类型时请考虑使用 JUC 包下的并发集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">synchronizedCollection(Collection&lt;T&gt;  c) <span class="comment">//返回指定 collection 支持的同步（线程安全的）collection。</span></span><br><span class="line">synchronizedList(List&lt;T&gt; list)<span class="comment">//返回指定列表支持的同步（线程安全的）List。</span></span><br><span class="line">synchronizedMap(Map&lt;K,V&gt; m)   <span class="comment">//返回由指定映射支持的同步（线程安全的）Map。</span></span><br><span class="line">synchronizedSet(Set&lt;T&gt; s)     <span class="comment">//返回指定 set 支持的同步（线程安全的）set。</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+</div><div class="article-licensing box"><div class="licensing-title"><p>集合</p><p><a href="https://wanyne-max.github.io/2022/02/02/集合/">https://wanyne-max.github.io/2022/02/02/集合/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Wanyne W</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2022-02-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2022-04-05</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2022/02/02/JVM-%E7%B1%BB/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">JVM-类</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2022/01/13/springboot%E6%B3%A8%E8%A7%A3/"><span class="level-item">Springboot 注解</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="Wanyne W"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Wanyne W</p><p class="is-size-6 is-block">所有命运的馈赠 早已暗中标注了价格</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">33</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">9</p></a></div></div></nav></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Blog/"><span class="level-start"><span class="level-item">Blog</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/Git/"><span class="level-start"><span class="level-item">Git</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/Redis/"><span class="level-start"><span class="level-item">Redis</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/SQL/"><span class="level-start"><span class="level-item">SQL</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/"><span class="level-start"><span class="level-item">知识区</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C/"><span class="level-start"><span class="level-item">网络</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2022/02/"><span class="level-start"><span class="level-item">二月 2022</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/01/"><span class="level-start"><span class="level-item">一月 2022</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/10/"><span class="level-start"><span class="level-item">十月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">13</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">JVM-垃圾回收</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%86%85%E5%AD%98/">JVM-内存</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Spring/">Spring</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Redis/">Redis</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/SpringBoot/">SpringBoot</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a><p class="is-size-7">   <span>&copy; 2022 Wanyne W</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">Made by Wanyne W</p><p class="is-size-7">Hope you have a good day！ ♥</p><p class="is-size-7">Creation date : 2021 08 05</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

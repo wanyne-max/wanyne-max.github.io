@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>JVM-类 - Wanyne&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Wanyne&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wanyne&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="1.类文件结构在 Java 中，JVM 可以理解的代码就叫做字节码（即扩展名为 .class 的文件），它不面向任何特定的处理器，只面向虚拟机。Java 语言通过字节码的方式，在一定程度上解决了传统解释型语言执行效率低的问题，同时又保留了解释型语言可移植的特点。所以 Java 程序运行时比较高效，而且，由于字节码并不针对一种特定的机器，因此，Java 程序无须重新编译便可在多种不同操作系统的计算机"><meta property="og:type" content="blog"><meta property="og:title" content="JVM-类"><meta property="og:url" content="https://wanyne-max.github.io/2022/02/02/JVM-%E7%B1%BB/"><meta property="og:site_name" content="Wanyne&#039;s Blog"><meta property="og:description" content="1.类文件结构在 Java 中，JVM 可以理解的代码就叫做字节码（即扩展名为 .class 的文件），它不面向任何特定的处理器，只面向虚拟机。Java 语言通过字节码的方式，在一定程度上解决了传统解释型语言执行效率低的问题，同时又保留了解释型语言可移植的特点。所以 Java 程序运行时比较高效，而且，由于字节码并不针对一种特定的机器，因此，Java 程序无须重新编译便可在多种不同操作系统的计算机"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/desktop%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E6%A6%82%E8%A7%88.6mgeiy6tq0g0.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%AD%97%E6%AE%B5%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.1g22xs9ivem8.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E6%96%B9%E6%B3%95%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.7gzgiianet40.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/accessflag.4kcirmk06s60.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/classloader.48ej1lifb5a0.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E9%AA%8C%E8%AF%81%E9%98%B6%E6%AE%B5.3umrgityz8o0.webp"><meta property="og:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%9B%B6%E5%80%BC.22zpa6hmo9hc.webp"><meta property="article:published_time" content="2022-02-01T18:22:22.000Z"><meta property="article:modified_time" content="2022-04-05T02:31:22.628Z"><meta property="article:author" content="Wanyne W"><meta property="article:tag" content="JVM"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/desktop%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E6%A6%82%E8%A7%88.6mgeiy6tq0g0.webp"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://wanyne-max.github.io/2022/02/02/JVM-%E7%B1%BB/"},"headline":"JVM-类","image":["https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/desktop%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E6%A6%82%E8%A7%88.6mgeiy6tq0g0.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%AD%97%E6%AE%B5%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.1g22xs9ivem8.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E6%96%B9%E6%B3%95%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.7gzgiianet40.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/accessflag.4kcirmk06s60.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/classloader.48ej1lifb5a0.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E9%AA%8C%E8%AF%81%E9%98%B6%E6%AE%B5.3umrgityz8o0.webp","https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%9B%B6%E5%80%BC.22zpa6hmo9hc.webp"],"datePublished":"2022-02-01T18:22:22.000Z","dateModified":"2022-04-05T02:31:22.628Z","author":{"@type":"Person","name":"Wanyne W"},"publisher":{"@type":"Organization","name":"Wanyne's Blog","logo":{"@type":"ImageObject","url":"https://wanyne-max.github.io/img/logo.svg"}},"description":"1.类文件结构在 Java 中，JVM 可以理解的代码就叫做字节码（即扩展名为 .class 的文件），它不面向任何特定的处理器，只面向虚拟机。Java 语言通过字节码的方式，在一定程度上解决了传统解释型语言执行效率低的问题，同时又保留了解释型语言可移植的特点。所以 Java 程序运行时比较高效，而且，由于字节码并不针对一种特定的机器，因此，Java 程序无须重新编译便可在多种不同操作系统的计算机"}</script><link rel="canonical" href="https://wanyne-max.github.io/2022/02/02/JVM-%E7%B1%BB/"><link rel="icon" href="/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.15.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/pace/1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-02-01T18:22:22.000Z" title="2022/2/2 上午2:22:22">2022-02-02</time>发表</span><span class="level-item"><time dateTime="2022-04-05T02:31:22.628Z" title="2022/4/5 上午10:31:22">2022-04-05</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></span><span class="level-item">32 分钟读完 (大约4774个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">JVM-类</h1><div class="content"><h1 id="1-类文件结构"><a href="#1-类文件结构" class="headerlink" title="1.类文件结构"></a>1.类文件结构</h1><p>在 Java 中，JVM 可以理解的代码就叫做<code>字节码</code>（即扩展名为 <code>.class 的文件</code>），它不面向任何特定的处理器，只<code>面向虚拟机</code>。Java 语言通过字节码的方式，在一定程度上解决了传统解释型语言执行效率低的问题，同时又保留了解释型语言可移植的特点。所以 Java 程序运行时比较高效，而且，由于字节码并不针对一种特定的机器，因此，Java 程序无须重新编译便可在多种不同操作系统的计算机上运行。</p>
+<p><escape><span id="more"></span></escape> </p>
+<p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/desktop%E7%B1%BB%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E6%A6%82%E8%A7%88.6mgeiy6tq0g0.webp" alt="desktop类文件结构概览"></p>
+<br>
+
+<h2 id="2-Class-文件结构总结"><a href="#2-Class-文件结构总结" class="headerlink" title="2.Class 文件结构总结"></a>2.Class 文件结构总结</h2><p>根据 Java 虚拟机规范，<code>Class 文件</code>通过 <code>ClassFile</code> 定义，有点类似 C 语言的结构体。</p>
+<p>ClassFile 的结构如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ClassFile &#123;</span><br><span class="line">    u4             magic; <span class="comment">//Class 文件的标志</span></span><br><span class="line">    u2             minor_version;<span class="comment">//Class 的小版本号</span></span><br><span class="line">    u2             major_version;<span class="comment">//Class 的大版本号</span></span><br><span class="line">    u2             constant_pool_count;<span class="comment">//常量池的数量</span></span><br><span class="line">    cp_info        constant_pool[constant_pool_count-<span class="number">1</span>];<span class="comment">//常量池</span></span><br><span class="line">    u2             access_flags;<span class="comment">//Class 的访问标记</span></span><br><span class="line">    u2             this_class;<span class="comment">//当前类</span></span><br><span class="line">    u2             super_class;<span class="comment">//父类</span></span><br><span class="line">    u2             interfaces_count;<span class="comment">//接口</span></span><br><span class="line">    u2             interfaces[interfaces_count];<span class="comment">//一个类可以实现多个接口</span></span><br><span class="line">    u2             fields_count;<span class="comment">//Class 文件的字段属性</span></span><br><span class="line">    field_info     fields[fields_count];<span class="comment">//一个类可以有多个字段</span></span><br><span class="line">    u2             methods_count;<span class="comment">//Class 文件的方法数量</span></span><br><span class="line">    method_info    methods[methods_count];<span class="comment">//一个类可以有个多个方法</span></span><br><span class="line">    u2             attributes_count;<span class="comment">//此类的属性表中的属性数</span></span><br><span class="line">    attribute_info attributes[attributes_count];<span class="comment">//属性表集合</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<h3 id="2-1-魔数（Magic-Number）"><a href="#2-1-魔数（Magic-Number）" class="headerlink" title="2.1 魔数（Magic Number）"></a>2.1 魔数（Magic Number）</h3><p>每个 Class 文件的头 4 个字节称为魔数（Magic Number）,它的唯一作用是确定这个文件<code>是否为一个能被虚拟机接收的 Class 文件</code>。</p>
+<pre><code>u4             magic; //Class 文件的标志
+</code></pre>
+<br>
+
+<h3 id="2-2-Class-文件版本号（Minor-amp-Major-Version）"><a href="#2-2-Class-文件版本号（Minor-amp-Major-Version）" class="headerlink" title="2.2 Class 文件版本号（Minor&amp;Major Version）"></a>2.2 Class 文件版本号（Minor&amp;Major Version）</h3><pre><code>u2             minor_version;//Class 的小版本号
+u2             major_version;//Class 的大版本号
+</code></pre>
+<p>使用 javap -v 命令来快速查看 Class 文件的版本号信息。</p>
+<p>高版本的 Java 虚拟机可以执行低版本编译器生成的 Class 文件，但是低版本的 Java 虚拟机不能执行高版本编译器生成的 Class 文件。所以，我们在实际开发的时候要确保开发的的 JDK 版本和生产环境的 JDK 版本保持一致。</p>
+<br>
+
+<h3 id="2-3-常量池（Constant-Pool）"><a href="#2-3-常量池（Constant-Pool）" class="headerlink" title="2.3 常量池（Constant Pool）"></a>2.3 常量池（Constant Pool）</h3><pre><code>u2             constant_pool_count;//常量池的数量
+cp_info        constant_pool[constant_pool_count-1];//常量池
+</code></pre>
+<p>常量池的数量是 <code>constant_pool_count-1</code>（常量池计数器是从 1 开始计数的，将第 0 项常量空出来是有特殊考虑的，索引值为 0 代表“不引用任何一个常量池项”）。</p>
+<p>常量池主要存放两大常量：字面量和符号引用。字面量比较接近于 Java 语言层面的的常量概念，如文本字符串、声明为 final 的常量值等。而符号引用则属于编译原理方面的概念。包括下面三类常量：</p>
+<ul>
+<li>类和接口的全限定名</li>
+<li>字段的名称和描述符</li>
+<li>方法的名称和描述符</li>
+</ul>
+<p>常量池中每一项常量都是一个表，这 14 种表有一个共同的特点：**<code>开始的第一位是一个 u1 类型的标志位 -tag 来标识常量的类型，代表当前这个常量属于哪种常量类型</code>**</p>
+<p>.class 文件可以通过<code>javap -v class</code>类名 指令来看一下其常量池中的信息(javap -v class类名-&gt; temp.txt ：将结果输出到 temp.txt 文件)。</p>
+<br>
+
+<h3 id="2-4-访问标志-Access-Flags"><a href="#2-4-访问标志-Access-Flags" class="headerlink" title="2.4 访问标志(Access Flags)"></a>2.4 访问标志(Access Flags)</h3><p>在常量池结束之后，紧接着的两个字节代表访问标志，这个标志用于识别一些类或者接口层次的访问信息，包括：这个 Class 是类还是接口，<code>是否为 public 或者 abstract 类型</code>，如果是类的话<code>是否声明为 final</code> 等等。</p>
+<br>
+
+<h3 id="2-5-当前类（This-Class）、父类（Super-Class）、接口（Interfaces）索引集合"><a href="#2-5-当前类（This-Class）、父类（Super-Class）、接口（Interfaces）索引集合" class="headerlink" title="2.5 当前类（This Class）、父类（Super Class）、接口（Interfaces）索引集合"></a>2.5 当前类（This Class）、父类（Super Class）、接口（Interfaces）索引集合</h3><pre><code>u2             this_class;//当前类
+u2             super_class;//父类
+u2             interfaces_count;//接口
+u2             interfaces[interfaces_count];//一个类可以实现多个接口
+</code></pre>
+<p><code>类索引</code>用于<code>确定这个类的全限定名</code>，<code>父类索引</code>用于确定这个类的<code>父类的全限定名</code>，由于 Java 语言的单继承，所以父类索引只有一个，除了 java.lang.Object 之外，所有的 java 类都有父类，因此除了 java.lang.Object 外，所有 Java 类的父类索引都不为 0。</p>
+<p>接口索引集合用来描述这个类实现了那些接口，这些被实现的接口将按 <code>implements</code> (如果这个类本身是接口的话则是<code>extends</code>) 后的接口顺序从左到右排列在接口索引集合中。</p>
+<br>
+
+<h3 id="2-6-字段表集合（Fields）"><a href="#2-6-字段表集合（Fields）" class="headerlink" title="2.6 字段表集合（Fields）"></a>2.6 字段表集合（Fields）</h3><pre><code>u2             fields_count;//Class 文件的字段的个数
+field_info     fields[fields_count];//一个类会可以有个字段
+</code></pre>
+<p><code>字段表</code>（field info）用于描述<code>接口或类中声明的变量</code>。字段包括类级变量以及实例变量，但不包括在方法内部声明的局部变量。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%AD%97%E6%AE%B5%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.1g22xs9ivem8.webp" alt="字段表的结构"></p>
+<ul>
+<li><code>access_flags</code>: 字段的作用域（public ,private,protected修饰符），是实例变量还是类变量（static修饰符）,可否被序列化（transient 修饰符）,可变性（final）,可见性（volatile 修饰符，是否强制从主内存读写）。</li>
+<li><code>name_index</code>: 对常量池的引用，表示的字段的名称；</li>
+<li><code>descriptor_index</code>: 对常量池的引用，表示字段和方法的描述符；</li>
+<li><code>attributes_count</code>: 一个字段还会拥有一些额外的属性，attributes_count 存放属性的个数；</li>
+<li><code>attributes[attributes_count]</code>: 存放具体属性具体内容。</li>
+</ul>
+<br>
+
+<h3 id="2-7-方法表集合（Methods）"><a href="#2-7-方法表集合（Methods）" class="headerlink" title="2.7 方法表集合（Methods）"></a>2.7 方法表集合（Methods）</h3><pre><code>u2             methods_count;//Class 文件的方法的数量
+method_info    methods[methods_count];//一个类可以有个多个方法
+</code></pre>
+<p><code>methods_count</code> 表示<code>方法的数量</code>，而 <code>method_info</code> 表示<code>方法表</code>。</p>
+<p>Class 文件存储格式中对方法的描述与对字段的描述几乎采用了完全一致的方式。方法表的结构如同字段表一样，依次包括了访问标志、名称索引、描述符索引、属性表集合。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E6%96%B9%E6%B3%95%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84.7gzgiianet40.webp" alt="方法表的结构"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/accessflag.4kcirmk06s60.webp" alt="accessflag"></p>
+<p>**<code>注意</code>**：因为<code>volatile</code>修饰符和<code>transient</code>修饰符<code>不可以修饰方法</code>，所以方法表的访问标志中没有这两个对应的标志，但是增加了synchronized、native、abstract等关键字修饰方法，所以也就多了这些关键字对应的标志。</p>
+<br>
+
+<h3 id="2-8-属性表集合（Attributes）"><a href="#2-8-属性表集合（Attributes）" class="headerlink" title="2.8 属性表集合（Attributes）"></a>2.8 属性表集合（Attributes）</h3><pre><code>u2             attributes_count;//此类的属性表中的属性数
+attribute_info attributes[attributes_count];//属性表集合
+</code></pre>
+<p>在 Class 文件，字段表，方法表中都可以携带自己的属性表集合，以用于描述某些场景专有的信息。与 Class 文件中其它的数据项目要求的顺序、长度和内容不同，属性表集合的限制稍微宽松一些，不再要求各个属性表具有严格的顺序，并且只要不与已有的属性名重复，任何人实现的编译器都可以向属性表中写 入自己定义的属性信息，Java 虚拟机运行时会忽略掉它不认识的属性。</p>
+<br>
+<br>
+
+<h1 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h1><h2 id="类加载过程"><a href="#类加载过程" class="headerlink" title="类加载过程"></a>类加载过程</h2><p>类加载过程：**<code>加载-&gt;连接-&gt;初始化</code>**。</p>
+<p>连接过程又可分为三步：**<code>验证-&gt;准备-&gt;解析</code>**。</p>
+<br>
+
+<h2 id="类加载器总结"><a href="#类加载器总结" class="headerlink" title="类加载器总结"></a>类加载器总结</h2><p>JVM 中内置了三个重要的 ClassLoader，除了 BootstrapClassLoader 其他类加载器均由 Java 实现且全部继承自java.lang.ClassLoader：</p>
+<ol>
+<li><p><strong><code>BootstrapClassLoader</code></strong>(启动类加载器) ：最顶层的加载类，由 C++实现，负责加载 %JAVA_HOME%/lib目录下的 jar 包和类或者被 -Xbootclasspath参数指定的路径中的所有类。</p>
+</li>
+<li><p><strong><code>ExtensionClassLoader</code></strong>(扩展类加载器) ：主要负责加载 %JRE_HOME%/lib/ext 目录下的 jar 包和类，或被 java.ext.dirs 系统变量所指定的路径下的 jar 包。</p>
+</li>
+<li><p><strong><code>AppClassLoader</code></strong>(应用程序类加载器) ：面向我们用户的加载器，负责加载当前应用 classpath 下的所有 jar 包和类。</p>
+</li>
+</ol>
+<br>
+
+<h2 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h2><h3 id="双亲委派模型介绍"><a href="#双亲委派模型介绍" class="headerlink" title="双亲委派模型介绍"></a>双亲委派模型介绍</h3><p>每一个类都有一个对应它的类加载器。系统中的 ClassLoader 在协同工作的时候会默认使用 <strong><code>双亲委派模型</code></strong> 。即在类加载的时候，系统会首先判断当前类是否被加载过。已经被加载的类会直接返回，否则才会尝试加载。加载的时候，首先会把该请求委派给父类加载器的 <code>loadClass()</code> 处理，因此所有的请求最终都应该传送到顶层的启动类加载器 <code>BootstrapClassLoader</code> 中。当父类加载器无法处理时，才由自己来处理。当父类加载器为 null 时，会使用启动类加载器 <code>BootstrapClassLoader</code> 作为父类加载器。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/classloader.48ej1lifb5a0.webp" alt="classloader"></p>
+<p>每个类加载都有一个<code>父类加载器</code>，双亲委派中的双亲更多地表达的是“父母这一辈”的人而已，并不是说真的有一个 Mother ClassLoader 和一个 Father ClassLoader 。另外，类加载器之间的“父子”关系也不是通过继承来体现的，是由“优先级”来决定。</p>
+<br>
+
+<h3 id="双亲委派模型的好处"><a href="#双亲委派模型的好处" class="headerlink" title="双亲委派模型的好处"></a>双亲委派模型的好处</h3><p>双亲委派模型保证了 Java 程序的稳定运行，可以<code>避免类的重复加载</code>（JVM 区分不同类的方式不仅仅根据类名，相同的类文件被不同的类加载器加载产生的是两个不同的类），也保证了 Java 的核心 API 不被篡改。如果没有使用双亲委派模型，而是每个类加载器加载自己的话就会出现一些问题，比如我们编写一个称为 java.lang.Object 类的话，那么程序运行的时候，系统就会出现多个不同的 Object 类。</p>
+<br>
+
+<h3 id="如果我们不想用双亲委派模型怎么办？"><a href="#如果我们不想用双亲委派模型怎么办？" class="headerlink" title="如果我们不想用双亲委派模型怎么办？"></a>如果我们不想用双亲委派模型怎么办？</h3><p>自定义加载器的话，需要继承 <code>ClassLoader</code> 。如果我们不想打破双亲委派模型，就重写 <code>ClassLoader</code> 类中的 <code>findClass()</code> 方法即可，无法被父类加载器加载的类最终会通过这个方法被加载。但是，如果想打破双亲委派模型则需要重写 <code>loadClass()</code> 方法</p>
+<br>
+
+<h2 id="自定义类加载器"><a href="#自定义类加载器" class="headerlink" title="自定义类加载器"></a>自定义类加载器</h2><p>除了 <code>BootstrapClassLoader</code> 其他类加载器均由 Java 实现且全部继承自java.lang.ClassLoader。如果我们要自定义自己的类加载器，很明显需要继承 <code>ClassLoader</code>。</p>
+<br>
+<br>
+
+<h1 id="类加载过程-1"><a href="#类加载过程-1" class="headerlink" title="类加载过程"></a>类加载过程</h1><h2 id="类的生命周期"><a href="#类的生命周期" class="headerlink" title="类的生命周期"></a>类的生命周期</h2><p>一个类的完整生命周期如下：</p>
+<p><strong><code>加载-&gt;连接-&gt;初始化-&gt;使用-&gt;卸载</code></strong></p>
+<br>
+
+<h2 id="类加载过程-2"><a href="#类加载过程-2" class="headerlink" title="类加载过程"></a>类加载过程</h2><p>系统加载 Class 类型的文件主要三步：**<code>加载-&gt;连接-&gt;初始化</code>**。</p>
+<p>连接过程又可分为三步：**<code>验证-&gt;准备-&gt;解析</code>**。</p>
+<br>
+
+<h3 id="加载"><a href="#加载" class="headerlink" title="加载"></a><strong>加载</strong></h3><p>类加载过程的第一步，主要完成下面 3 件事情：</p>
+<p>通过全类名获取定义此类的二进制字节流<br>将字节流所代表的静态存储结构转换为方法区的运行时数据结构</p>
+<p>一个非数组类的<code>加载阶段</code>（加载阶段获取类的二进制字节流的动作）是可控性最强的阶段，这一步我们可以去完成还可以自定义类加载器去<code>控制字节流的获取方式</code>（重写一个类加载器的 loadClass() 方法）。数组类型不通过类加载器创建，它由 <code>Java 虚拟机直接创建</code>。</p>
+<br>
+
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a><strong>验证</strong></h3><p><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E9%AA%8C%E8%AF%81%E9%98%B6%E6%AE%B5.3umrgityz8o0.webp" alt="验证阶段"></p>
+<br>
+
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a><strong>准备</strong></h3><p><strong>准备阶段是正式为类变量分配内存并设置类变量初始值的阶段</strong>，这些内存都将在方法区中分配。对于该阶段有以下几点需要注意：</p>
+<ol>
+<li><p>这时候进行内存分配的仅包括类变量（ Class Variables ，即静态变量，被 <code>static</code> 关键字修饰的变量，只与类相关，因此被称为类变量），而不包括实例变量。实例变量会在对象实例化时随着对象一块分配在 Java 堆中。</p>
+</li>
+<li><p>从概念上讲，类变量所使用的内存都应当在 <code>方法区</code> 中进行分配。不过有一点需要注意的是：JDK 7 之前，HotSpot 使用永久代来实现方法区的时候，实现是完全符合这种逻辑概念的。 而在 JDK 7 及之后，HotSpot 已经把原本放在永久代的字符串常量池、静态变量等移动到堆中，这个时候类变量则会随着 Class 对象一起存放在 Java 堆中。</p>
+</li>
+<li><p>这里所设置的初始值”通常情况”下是数据类型默认的零值（如 0、0L、null、false 等），比如我们定义了public static int value=111 ，那么 value 变量在准备阶段的初始值就是 0 而不是 111（初始化阶段才会赋值）。特殊情况：比如给 value 变量加上了 final 关键字public static final int value=111 ，那么准备阶段 value 的值就被赋值为 111。</p>
+</li>
+</ol>
+<p>基本数据类型的零值 ：<br><img src="https://cdn.jsdelivr.net/gh/wanyne-max/image-host@master/java/%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%9B%B6%E5%80%BC.22zpa6hmo9hc.webp" alt="基本数据类型的零值"></p>
+<br>
+
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a><strong>解析</strong></h3><p>解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程。解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用限定符 7 类符号引用进行。</p>
+<p>符号引用就是一组符号来描述目标，可以是任何字面量。<code>直接引用</code>就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄。在程序实际运行时，只有符号引用是不够的，举个例子：在程序执行方法时，系统需要明确知道这个方法所在的位置。Java 虚拟机为每个类都准备了一张方法表来存放类中所有的方法。当需要调用一个类的方法的时候，只要知道这个方法在方法表中的偏移量就可以直接调用该方法了。通过解析操作符号引用就可以直接转变为目标方法在类中方法表的位置，从而使得方法可以被调用。</p>
+<p>综上，解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程，也就是得到类或者字段、方法在内存中的指针或者偏移量。</p>
+<br>
+
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a><strong>初始化</strong></h3><p>初始化阶段是执行初始化方法 <code>&lt;clinit&gt; ()</code>方法的过程，是类加载的最后一步，这一步 JVM 才开始真正执行类中定义的 Java 程序代码(字节码)。</p>
+<p>说明： <code>&lt;clinit&gt; ()</code>方法是编译之后自动生成的。</p>
+<p>对于<code>&lt;clinit&gt; () </code>方法的调用，虚拟机会自己确保其在多线程环境中的安全性。因为 <code>&lt;clinit&gt; ()</code> 方法是带锁线程安全，所以在多线程环境下进行类初始化的话可能会引起多个进程阻塞，并且这种阻塞很难被发现。</p>
+<ol>
+<li><p>对于初始化阶段，虚拟机严格规范了有且只有 5 种情况下，必须对类进行初始化(只有主动去使用类才会初始化类)：</p>
+<ul>
+<li><p>当遇到 <code>new 、 getstatic、putstatic 或 invokestatic</code> 这 4 条直接码指令时，比如 new 一个类，读取一个静态字段(未被 final 修饰)、或调用一个类的静态方法时。</p>
+</li>
+<li><p>当 jvm 执行 <code>new</code> 指令时会初始化类。即当程序创建一个类的实例对象。</p>
+</li>
+<li><p>当 jvm 执行 <code>getstatic</code> 指令时会初始化类。即程序访问类的静态变量(不是静态常量，常量会被加载到运行时常量池)。</p>
+</li>
+<li><p>当 jvm 执行 <code>putstatic</code> 指令时会初始化类。即程序给类的静态变量赋值。</p>
+</li>
+<li><p>当 jvm 执行 <code>invokestatic</code> 指令时会初始化类。即程序调用类的静态方法。</p>
+</li>
+</ul>
+</li>
+<li><p>使用 java.lang.reflect 包的方法对类进行反射调用时如 <code>Class.forname(&quot;...&quot;)</code>, <code>newInstance()</code> 等等。如果类没初始化，需要触发其初始化。</p>
+</li>
+<li><p>初始化一个类，如果其父类还未初始化，则<code>先触发该父类的初始化</code>。</p>
+</li>
+<li><p>当虚拟机启动时，用户需要定义一个要执行的<code>主类</code> (包含 main 方法的那个类)，虚拟机会先初始化这个类。</p>
+</li>
+<li><p>MethodHandle 和 VarHandle 可以看作是轻量级的反射调用机制，而要想使用这 2 个调用， 就必须先使用 findStaticVarHandle 来初始化要调用的类。</p>
+</li>
+<li><p>当一个接口中定义了 JDK8 新加入的默认方法（被 default 关键字修饰的接口方法）时，如果有这个接口的实现类发生了初始化，那该接口要在其之前被初始化。</p>
+</li>
+</ol>
+<br>
+
+<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a><strong>卸载</strong></h3><p>卸载类即该类的 Class 对象被 GC。</p>
+<p>卸载类需要满足 3 个要求:</p>
+<ol>
+<li>该类的所有的实例对象都已被 GC，也就是说堆不存在该类的实例对象。</li>
+<li>该类没有在其他任何地方被引用</li>
+<li>该类的类加载器的实例已被 GC</li>
+</ol>
+<p>所以，在 JVM 生命周期内，由 jvm 自带的类加载器加载的类是不会被卸载的。但是由我们自定义的类加载器加载的类是可能被卸载的。</p>
+<p>只要想通一点就好了，jdk 自带的 <code>BootstrapClassLoader, ExtClassLoader, AppClassLoader</code> 负责加载 jdk 提供的类，所以它们(类加载器的实例)肯定不会被回收。而我们自定义的类加载器的实例是可以被回收的，所以使用我们自定义加载器加载的类是可以被卸载掉的。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>JVM-类</p><p><a href="https://wanyne-max.github.io/2022/02/02/JVM-类/">https://wanyne-max.github.io/2022/02/02/JVM-类/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Wanyne W</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2022-02-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2022-04-05</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/JVM/">JVM</a></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2022/02/02/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">线程池</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2022/02/02/%E9%9B%86%E5%90%88/"><span class="level-item">集合</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="Wanyne W"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Wanyne W</p><p class="is-size-6 is-block">所有命运的馈赠 早已暗中标注了价格</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">33</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">9</p></a></div></div></nav></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Blog/"><span class="level-start"><span class="level-item">Blog</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/Git/"><span class="level-start"><span class="level-item">Git</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/Redis/"><span class="level-start"><span class="level-item">Redis</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/SQL/"><span class="level-start"><span class="level-item">SQL</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/"><span class="level-start"><span class="level-item">知识区</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C/"><span class="level-start"><span class="level-item">网络</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2022/02/"><span class="level-start"><span class="level-item">二月 2022</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/01/"><span class="level-start"><span class="level-item">一月 2022</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/10/"><span class="level-start"><span class="level-item">十月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">13</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">JVM-垃圾回收</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%86%85%E5%AD%98/">JVM-内存</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Spring/">Spring</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Redis/">Redis</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/SpringBoot/">SpringBoot</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a><p class="is-size-7">   <span>&copy; 2022 Wanyne W</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">Made by Wanyne W</p><p class="is-size-7">Hope you have a good day！ ♥</p><p class="is-size-7">Creation date : 2021 08 05</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

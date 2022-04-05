@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>SpringBoot - Wanyne&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Wanyne&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Wanyne&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="什么是 SpringBoot 自动装配？自动装配可以简单理解为：通过注解或者一些简单的配置就能在 Spring Boot 的帮助下实现某块功能。"><meta property="og:type" content="blog"><meta property="og:title" content="SpringBoot"><meta property="og:url" content="https://wanyne-max.github.io/2022/02/02/SpringBoot/"><meta property="og:site_name" content="Wanyne&#039;s Blog"><meta property="og:description" content="什么是 SpringBoot 自动装配？自动装配可以简单理解为：通过注解或者一些简单的配置就能在 Spring Boot 的帮助下实现某块功能。"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://wanyne-max.github.io/img/og_image.png"><meta property="article:published_time" content="2022-02-01T18:22:22.000Z"><meta property="article:modified_time" content="2022-04-05T02:33:41.910Z"><meta property="article:author" content="Wanyne W"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://wanyne-max.github.io/2022/02/02/SpringBoot/"},"headline":"SpringBoot","image":["https://wanyne-max.github.io/img/og_image.png"],"datePublished":"2022-02-01T18:22:22.000Z","dateModified":"2022-04-05T02:33:41.910Z","author":{"@type":"Person","name":"Wanyne W"},"publisher":{"@type":"Organization","name":"Wanyne's Blog","logo":{"@type":"ImageObject","url":"https://wanyne-max.github.io/img/logo.svg"}},"description":"什么是 SpringBoot 自动装配？自动装配可以简单理解为：通过注解或者一些简单的配置就能在 Spring Boot 的帮助下实现某块功能。"}</script><link rel="canonical" href="https://wanyne-max.github.io/2022/02/02/SpringBoot/"><link rel="icon" href="/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.15.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/pace/1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2022-02-01T18:22:22.000Z" title="2022/2/2 上午2:22:22">2022-02-02</time>发表</span><span class="level-item"><time dateTime="2022-04-05T02:33:41.910Z" title="2022/4/5 上午10:33:41">2022-04-05</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></span><span class="level-item">14 分钟读完 (大约2124个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">SpringBoot</h1><div class="content"><h2 id="什么是-SpringBoot-自动装配？"><a href="#什么是-SpringBoot-自动装配？" class="headerlink" title="什么是 SpringBoot 自动装配？"></a>什么是 SpringBoot 自动装配？</h2><p>自动装配可以简单理解为：通过<code>注解</code>或者一些简单的<code>配置</code>就能在 Spring Boot 的帮助下实现某块功能。</p>
+<p><escape><span id="more"></span></escape> </p>
+<br>
+
+<h2 id="自动装配"><a href="#自动装配" class="headerlink" title="自动装配"></a>自动装配</h2><p><code>@EnableAutoConfiguration</code> 只是一个简单地注解，自动装配核心功能的实现实际是通过 <code>AutoConfigurationImportSelector类</code>。</p>
+<p>Spring Boot 通过<code>@EnableAutoConfiguration</code>开启自动装配，通过 <code>SpringFactoriesLoader</code>实例化相应的Bean, 最终加载META-INF/spring.factories中的<code>自动配置类</code>实现自动装配</p>
+<p>自动配置类其实就是通过<code>@Conditional</code>按需加载的<code>配置类</code>，想要其生效必须引入<code>spring-boot-starter-xxx包</code>实现起步依赖</p>
+<br>
+
+<h1 id="1-SpringBootApplication"><a href="#1-SpringBootApplication" class="headerlink" title="1. @SpringBootApplication"></a>1. @SpringBootApplication</h1><p><code>@SpringBootApplication</code>看作是 <code>@Configuration</code>、<code>@EnableAutoConfiguration</code>、<code>@ComponentScan</code> 注解的集合。</p>
+<p>这三个注解的作用分别是：</p>
+<p><code>@EnableAutoConfiguration</code>：启用 SpringBoot 的自动配置机制</p>
+<p><code>@Configuration</code>：允许在上下文中注册额外的 bean 或导入其他配置类</p>
+<p><code>@ComponentScan</code>： 扫描被<code> @Component</code> (@Service,@Controller)注解的 <code>bean</code>，注解默认会扫描启动类所在的包下所有的类 ，可以自定义不扫描某些 bean(在@ComponentScan后使用<code>excludeFilters=&#123;&#125; </code>)。</p>
+<br>
+
+<h1 id="2-Spring-Bean-相关"><a href="#2-Spring-Bean-相关" class="headerlink" title="2. Spring Bean 相关"></a>2. Spring Bean 相关</h1><h2 id="2-1-Autowired"><a href="#2-1-Autowired" class="headerlink" title="2.1. @Autowired"></a>2.1. @Autowired</h2><p>自动导入<code>对象</code>到<code>类</code>中，被注入进的类同样要被 Spring 容器管理比如：Service 类注入到 Controller 类中。</p>
+<h2 id="2-2-Component-Repository-Service-Controller"><a href="#2-2-Component-Repository-Service-Controller" class="headerlink" title="2.2. @Component,@Repository,@Service, @Controller"></a>2.2. @Component,@Repository,@Service, @Controller</h2><p>我们一般使用 @Autowired 注解让 Spring 容器帮我们自动装配 bean。要想把类标识成可用于 @Autowired 注解自动装配的 bean 的类,可以采用以下注解实现：</p>
+<ul>
+<li><code>@Component</code> ：通用的注解，可标注任意类为 Spring 组件。如果一个 Bean 不知道属于哪个层，可以使用@Component 注解标注。</li>
+<li><code>@Repository</code> : 对应持久层即 Dao 层，主要用于数据库相关操作。</li>
+<li><code>@Service</code> : 对应服务层，主要涉及一些复杂的逻辑，需要用到 Dao 层。</li>
+<li><code>@Controller</code> : 对应 Spring MVC 控制层，主要用于接受用户请求并调用 Service 层返回数据给前端页面。</li>
+</ul>
+<h2 id="2-3-RestController"><a href="#2-3-RestController" class="headerlink" title="2.3. @RestController"></a>2.3. @RestController</h2><p><code>@RestController</code>注解是<code> @Controller</code>和<code> @ResponseBody</code>的合集,表示这是个控制器 <code> bean</code>,并且是将函数的<code>返回值直接填入 HTTP 响应体中</code>,是 REST 风格的控制器。</p>
+<p>单独使用 @Controller 不加 @ResponseBody的话一般是用在要返回一个<code>视图</code>的情况，这种情况属于比较传统的 Spring MVC 的应用，对应于前后端不分离的情况。<code>@Controller </code>+<code>@ResponseBody</code> 返回 JSON 或 XML 形式数据</p>
+<h2 id="2-4-Scope"><a href="#2-4-Scope" class="headerlink" title="2.4. @Scope"></a>2.4. @Scope</h2><p><code>声明</code> Spring Bean 的<code>作用域</code></p>
+<p>四种常见的 Spring Bean 的作用域：</p>
+<ul>
+<li><code>singleton</code> : 唯一 bean 实例，Spring 中的 bean 默认都是单例的。</li>
+<li><code>prototype</code> : 每次请求都会创建一个新的 bean 实例。</li>
+<li><code>request</code> : 每一次 HTTP 请求都会产生一个新的 bean，该 bean 仅在当前 HTTP request 内有效。</li>
+<li><code>session</code> : 每一个 HTTP Session 会产生一个新的 bean，该 bean 仅在当前 HTTP session 内有效。</li>
+</ul>
+<h2 id="2-5-Configuration"><a href="#2-5-Configuration" class="headerlink" title="2.5. @Configuration"></a>2.5. @Configuration</h2><p>一般用来声明配置类，可以使用 @Component注解替代，不过使用@Configuration注解声明配置类更加语义化。</p>
+<br>
+
+<h1 id="3-处理常见的-HTTP-请求类型"><a href="#3-处理常见的-HTTP-请求类型" class="headerlink" title="3. 处理常见的 HTTP 请求类型"></a>3. 处理常见的 HTTP 请求类型</h1><p>5 种常见的请求类型:</p>
+<ul>
+<li><code>GET</code> ：请求从服务器获取特定资源。举个例子：GET /users（获取所有学生）</li>
+<li><code>POST</code> ：在服务器上创建一个新的资源。举个例子：POST /users（创建学生）</li>
+<li><code>PUT</code> ：更新服务器上的资源（客户端提供更新后的整个资源）。举个例子：PUT /users/12（更新编号为 12 的学生）</li>
+<li><code>DELETE</code> ：从服务器删除特定的资源。举个例子：DELETE /users/12（删除编号为 12 的学生）</li>
+<li><code>PATCH</code> ：更新服务器上的资源（客户端提供更改的属性，可以看做作是部分更新），使用的比较少，这里就不举例子了。</li>
+</ul>
+<h2 id="3-1-GET-请求"><a href="#3-1-GET-请求" class="headerlink" title="3.1. GET 请求"></a>3.1. GET 请求</h2><p><code>@GetMapping(&quot;users&quot;)</code> 等价于<code>@RequestMapping(value=&quot;/users&quot;,method=RequestMethod.GET)</code></p>
+<h2 id="3-2-POST-请求"><a href="#3-2-POST-请求" class="headerlink" title="3.2. POST 请求"></a>3.2. POST 请求</h2><p><code>@PostMapping(&quot;users&quot;)</code> 等价于<code>@RequestMapping(value=&quot;/users&quot;,method=RequestMethod.POST)</code></p>
+<h2 id="3-3-PUT-请求"><a href="#3-3-PUT-请求" class="headerlink" title="3.3. PUT 请求"></a>3.3. PUT 请求</h2><p><code>@PutMapping(&quot;/users/&#123;userId&#125;&quot;)</code> 等价于<code>@RequestMapping(value=&quot;/users/&#123;userId&#125;&quot;,method=RequestMethod.PUT)</code></p>
+<h2 id="3-4-DELETE-请求"><a href="#3-4-DELETE-请求" class="headerlink" title="3.4. DELETE 请求"></a>3.4. DELETE 请求</h2><p><code>@DeleteMapping(&quot;/users/&#123;userId&#125;&quot;)</code>等价于<code>@RequestMapping(value=&quot;/users/&#123;userId&#125;&quot;,method=RequestMethod.DELETE)</code></p>
+<h2 id="3-5-PATCH-请求"><a href="#3-5-PATCH-请求" class="headerlink" title="3.5. PATCH 请求"></a>3.5. PATCH 请求</h2><p>一般实际项目中，我们都是 <code>PUT 不够用</code>了之后才用 <code>PATCH 请求</code>去更新数据。</p>
+<br>
+
+<h1 id="4-前后端传值"><a href="#4-前后端传值" class="headerlink" title="4. 前后端传值"></a>4. 前后端传值</h1><h2 id="4-1-PathVariable-和-RequestParam"><a href="#4-1-PathVariable-和-RequestParam" class="headerlink" title="4.1. @PathVariable 和 @RequestParam"></a>4.1. @PathVariable 和 @RequestParam</h2><p>@PathVariable用于获取路径参数，@RequestParam用于获取查询参数。</p>
+<h2 id="4-2-RequestBody"><a href="#4-2-RequestBody" class="headerlink" title="4.2. @RequestBody"></a>4.2. @RequestBody</h2><p>用于读取 <code>Request 请求</code>（可能是 POST,PUT,DELETE,GET 请求）的 body 部分并且Content-Type 为 application/json 格式的数据，接收到数据之后会自动将数据绑定到 Java 对象上去。系统会使用<code>HttpMessageConverter</code>或者自定义的<code>HttpMessageConverter</code>将请求的 body 中的 <code>json 字符串转换为 java 对象</code>。</p>
+<p><strong>一个请求方法只可以有一个@RequestBody，但是可以有多个@RequestParam和@PathVariable</strong></p>
+<br>
+
+<h1 id="5-读取配置信息"><a href="#5-读取配置信息" class="headerlink" title="5. 读取配置信息"></a>5. 读取配置信息</h1><h2 id="5-1-Value-常用"><a href="#5-1-Value-常用" class="headerlink" title="5.1. @Value(常用)"></a>5.1. @Value(常用)</h2><p>使用 <code>@Value(&quot;$&#123;property&#125;&quot;)</code> 读取比较简单的配置信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value(&quot;$&#123;wuhan2020&#125;&quot;)</span> <span class="comment">//配置文件中内容</span></span><br><span class="line">String wuhan2020;</span><br></pre></td></tr></table></figure>
+<h2 id="5-2-ConfigurationProperties-常用"><a href="#5-2-ConfigurationProperties-常用" class="headerlink" title="5.2. @ConfigurationProperties(常用)"></a>5.2. @ConfigurationProperties(常用)</h2><p>通过<code>@ConfigurationProperties</code>读取配置信息并与 <code>bean </code>绑定。</p>
+<br>
+
+<h2 id="5-3-PropertySource（不常用）"><a href="#5-3-PropertySource（不常用）" class="headerlink" title="5.3. @PropertySource（不常用）"></a>5.3. @PropertySource（不常用）</h2><p>@PropertySource读取指定 <code>properties</code> 文件</p>
+<br>
+
+<h1 id="6-参数校验"><a href="#6-参数校验" class="headerlink" title="6. 参数校验"></a>6. 参数校验</h1><h2 id="6-1-一些常用的字段验证的注解"><a href="#6-1-一些常用的字段验证的注解" class="headerlink" title="6.1. 一些常用的字段验证的注解"></a>6.1. 一些常用的字段验证的注解</h2><ul>
+<li><code>@NotEmpty</code> 被注释的字符串的不能为 null 也不能为空</li>
+<li><code>@NotBlank</code> 被注释的字符串非 null，并且必须包含一个非空白字符</li>
+<li><code>@Null</code> 被注释的元素必须为 null</li>
+<li><code>@NotNull</code> 被注释的元素必须不为 null</li>
+<li><code>@AssertTrue</code> 被注释的元素必须为 true</li>
+<li><code>@AssertFalse</code> 被注释的元素必须为 false</li>
+<li><code>@Pattern(regex=,flag=)</code>被注释的元素必须符合指定的正则表达式</li>
+<li><code>@Email</code> 被注释的元素必须是 Email 格式。</li>
+<li><code>@Min(value)</code>被注释的元素必须是一个数字，其值必须大于等于指定的最小值</li>
+<li><code>@Max(value)</code>被注释的元素必须是一个数字，其值必须小于等于指定的最大值</li>
+<li><code>@DecimalMin(value)</code>被注释的元素必须是一个数字，其值必须大于等于指定的最小值</li>
+<li><code>@DecimalMax(value)</code> 被注释的元素必须是一个数字，其值必须小于等于指定的最大值</li>
+<li><code>@Size(max=, min=)</code>被注释的元素的大小必须在指定的范围内</li>
+<li><code>@Digits(integer, fraction)</code>被注释的元素必须是一个数字，其值必须在可接受的范围内</li>
+<li><code>@Past</code>被注释的元素必须是一个过去的日期</li>
+<li><code>@Future</code> 被注释的元素必须是一个将来的日期</li>
+</ul>
+<h2 id="6-2-验证请求体-RequestBody"><a href="#6-2-验证请求体-RequestBody" class="headerlink" title="6.2. 验证请求体(RequestBody)"></a>6.2. 验证请求体(RequestBody)</h2><p>在需要验证的参数上加上了<code>@Valid注解</code>，如果验证失败，它将抛出<code>MethodArgumentNotValidException</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/api&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostMapping(&quot;/person&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResponseEntity&lt;Person&gt; <span class="title">getPerson</span><span class="params">(<span class="meta">@RequestBody</span> <span class="meta">@Valid</span> Person person)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ResponseEntity.ok().body(person);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="6-3-验证请求参数-Path-Variables-和-Request-Parameters"><a href="#6-3-验证请求参数-Path-Variables-和-Request-Parameters" class="headerlink" title="6.3. 验证请求参数(Path Variables 和 Request Parameters)"></a>6.3. 验证请求参数(Path Variables 和 Request Parameters)</h2><p>一定一定不要忘记在<code>类上</code>加上 <code>@Validated</code> 注解了，这个参数可以告诉 Spring 去校验方法参数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/api&quot;)</span></span><br><span class="line"><span class="meta">@Validated</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/person/&#123;id&#125;&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResponseEntity&lt;Integer&gt; <span class="title">getPersonByID</span><span class="params">(<span class="meta">@Valid</span> <span class="meta">@PathVariable(&quot;id&quot;)</span> <span class="meta">@Max(value = 5,message = &quot;超过 id 的范围了&quot;)</span> Integer id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ResponseEntity.ok().body(id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-全局处理-Controller-层异常"><a href="#7-全局处理-Controller-层异常" class="headerlink" title="7. 全局处理 Controller 层异常"></a>7. 全局处理 Controller 层异常</h1><p>全局处理 Controller 层异常。</p>
+<p>相关注解：</p>
+<p><code>@ControllerAdvice</code> :注解定义全局异常处理类</p>
+<p><code>@ExceptionHandler</code> :注解声明异常处理方法</p>
+<h1 id="8-JPA"><a href="#8-JPA" class="headerlink" title="//8. JPA"></a>//8. JPA</h1><br>
+
+<h1 id="9-事务-Transactional"><a href="#9-事务-Transactional" class="headerlink" title="9. 事务 @Transactional"></a>9. 事务 @Transactional</h1><p>在要开启事务的方法上使用@Transactional注解即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional(rollbackFor = Exception.class)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道 <code>Exception</code> 分为<code>运行时异常</code> RuntimeException 和<code>非运行时异常</code>。在<code>@Transactional</code>注解中如果<code>不配置rollbackFor属性</code>,那么事务只会在遇到<code>RuntimeException</code>的时候<code>才会回滚</code>,加上<code>rollbackFor=Exception.class</code>,可以让事务在遇到<code>非运行时异常时也回滚</code>。</p>
+<p><code>@Transactional</code> 注解一般可以作用在类或者方法上。</p>
+<p>作用于<code>类</code>：当把@Transactional 注解放在<code>类</code>上时，表示<code>所有该类</code>的 public 方法都配置相同的事务属性信息。</p>
+<p>作用于<code>方法</code>：当<code>类配置了@Transactional，方法也配置了@Transactional</code>，方法的事务会覆盖类的事务配置信息。</p>
+<br>
+
+<h1 id="11-测试相关"><a href="#11-测试相关" class="headerlink" title="11. 测试相关"></a>11. 测试相关</h1><p><code>@ActiveProfiles</code>一般作用于测试类上， 用于声明生效的 Spring 配置文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest(webEnvironment = RANDOM_PORT)</span></span><br><span class="line"><span class="meta">@ActiveProfiles(&quot;test&quot;)</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBase</span> </span>&#123;</span><br><span class="line">  ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Test</code>声明一个方法为测试方法</p>
+<p><code>@Transactional</code>被声明的测试方法的数据会回滚，避免污染测试数据。</p>
+<p><code>@WithMockUser</code> Spring Security 提供的，用来模拟一个真实用户，并且可以赋予权限。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="meta">@WithMockUser(username = &quot;user-id-18163138155&quot;, authorities = &quot;ROLE_TEACHER&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">should_import_student_success</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+</div><div class="article-licensing box"><div class="licensing-title"><p>SpringBoot</p><p><a href="https://wanyne-max.github.io/2022/02/02/SpringBoot/">https://wanyne-max.github.io/2022/02/02/SpringBoot/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Wanyne W</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2022-02-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2022-04-05</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2022/02/02/Redis/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">Redis</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2022/02/02/mybatis/"><span class="level-item">mybatis</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/img/avatar.png" alt="Wanyne W"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Wanyne W</p><p class="is-size-6 is-block">所有命运的馈赠 早已暗中标注了价格</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">33</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">9</p></a></div></div></nav></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Blog/"><span class="level-start"><span class="level-item">Blog</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/Git/"><span class="level-start"><span class="level-item">Git</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/Redis/"><span class="level-start"><span class="level-item">Redis</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/SQL/"><span class="level-start"><span class="level-item">SQL</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/"><span class="level-start"><span class="level-item">知识区</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C/"><span class="level-start"><span class="level-item">网络</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2022/02/"><span class="level-start"><span class="level-item">二月 2022</span></span><span class="level-end"><span class="level-item tag">14</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/01/"><span class="level-start"><span class="level-item">一月 2022</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/10/"><span class="level-start"><span class="level-item">十月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">13</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><!--!--><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">JVM-垃圾回收</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/JVM-%E5%86%85%E5%AD%98/">JVM-内存</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Spring/">Spring</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/Redis/">Redis</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2022-02-01T18:22:22.000Z">2022-02-02</time></p><p class="title"><a href="/2022/02/02/SpringBoot/">SpringBoot</a></p><p class="categories"><a href="/categories/%E7%9F%A5%E8%AF%86%E5%8C%BA/">知识区</a></p></div></article></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Wanyne&#039;s Blog" height="28"></a><p class="is-size-7">   <span>&copy; 2022 Wanyne W</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">Made by Wanyne W</p><p class="is-size-7">Hope you have a good day！ ♥</p><p class="is-size-7">Creation date : 2021 08 05</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/cookieconsent/3.1.1/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.6.8/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.7.0/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
